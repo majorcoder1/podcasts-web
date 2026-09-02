@@ -1,0 +1,7 @@
+# Included by api.php only; never requested directly.
+Require all denied
+
+<IfModule !mod_authz_core.c>
+    Order allow,deny
+    Deny from all
+</IfModule>

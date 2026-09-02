@@ -11,7 +11,7 @@
     RewriteEngine On
 
     # /api/<name> -> api.php, which routes on the last path segment.
-    RewriteRule ^api/(health|feed|search|charts|audio)/?$ api.php [QSA,L]
+    RewriteRule ^api/(health|register|login|logout|me|password|sync|feed|search|charts|audio)/?$ api.php [QSA,L]
 
     # Single-page app: any path that is not a real file renders the shell and
     # routes client-side, so /show/... survives a refresh or a shared link.
@@ -62,6 +62,11 @@
 <IfModule mod_dir.c>
     DirectoryIndex index.html index.php
 </IfModule>
+
+# Server-side code and the database are never served as files. The data
+# directory also lives above the document root where the host allows it, so a
+# host that ignores .htaccess still cannot hand out the database.
+RedirectMatch 404 ^/(lib|data)/
 
 # Nothing here should ever be listed.
 Options -Indexes

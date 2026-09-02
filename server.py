@@ -30,6 +30,8 @@ import urllib.parse
 import urllib.request
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
+import app_api
+
 HERE = os.path.dirname(os.path.abspath(__file__))
 PUBLIC = os.path.join(HERE, "public")
 
@@ -138,6 +140,11 @@ def cached_feed(url: str) -> tuple[bytes, str]:
     return body, content_type
 
 
+ACCOUNT_ROUTES = {
+    "/api/register", "/api/login", "/api/logout", "/api/me", "/api/password",
+}
+
+
 class Handler(BaseHTTPRequestHandler):
     server_version = "PodcastsWeb"
     protocol_version = "HTTP/1.1"
@@ -155,12 +162,24 @@ class Handler(BaseHTTPRequestHandler):
         finally:
             self.head_only = False
 
+    def do_POST(self):
+        self.dispatch()
+
     def do_GET(self):
+        self.dispatch()
+
+    def dispatch(self):
         parsed = urllib.parse.urlparse(self.path)
         route = parsed.path
         query = urllib.parse.parse_qs(parsed.query)
 
         try:
+            if route in ACCOUNT_ROUTES or route == "/api/sync":
+                return self.api_account(route, query)
+            if route == "/api/health":
+                return self.api_health()
+            if self.command != "GET":
+                return self.send_json({"error": "Method not allowed"}, 405)
             if route == "/api/feed":
                 return self.api_feed(query)
             if route == "/api/search":
@@ -172,6 +191,8 @@ class Handler(BaseHTTPRequestHandler):
             if route.startswith("/api/"):
                 return self.send_json({"error": "Unknown endpoint"}, 404)
             return self.serve_static(route)
+        except app_api.ApiError as error:
+            return self.send_json({"error": error.message}, error.status)
         except UpstreamError as error:
             return self.send_json({"error": error.message}, error.status)
         except BrokenPipeError:
@@ -179,6 +200,91 @@ class Handler(BaseHTTPRequestHandler):
         except Exception as error:  # noqa: BLE001 - never take the server down
             self.log_message("unhandled: %r", error)
             return self.send_json({"error": "Internal error"}, 500)
+
+    # ---- accounts and sync -----------------------------------------------
+
+    def read_json_body(self):
+        length = int(self.headers.get("Content-Length") or 0)
+        if length <= 0:
+            return {}
+        if length > 8 * 1024 * 1024:
+            raise app_api.ApiError(413, "That request is too large")
+        raw = self.rfile.read(length)
+        try:
+            payload = json.loads(raw.decode("utf-8"))
+        except (UnicodeDecodeError, json.JSONDecodeError):
+            raise app_api.ApiError(400, "Body must be JSON") from None
+        return payload if isinstance(payload, dict) else {}
+
+    def presented_token(self):
+        header = self.headers.get("Authorization", "")
+        if header.lower().startswith("bearer "):
+            return header[7:].strip()
+        cookie = self.headers.get("Cookie", "")
+        for part in cookie.split(";"):
+            name, _, value = part.strip().partition("=")
+            if name == app_api.COOKIE_NAME:
+                return value
+        return ""
+
+    def require_user(self):
+        user = app_api.user_for_token(self.presented_token())
+        if user is None:
+            raise app_api.ApiError(401, "Sign in to continue")
+        return user
+
+    def require_json_post(self):
+        # A browser cannot send this content type cross-site without a CORS
+        # preflight, which never succeeds here. That plus SameSite on the
+        # cookie is the CSRF defence.
+        if self.command != "POST":
+            raise app_api.ApiError(405, "Use POST for this endpoint")
+        if "application/json" not in (self.headers.get("Content-Type") or ""):
+            raise app_api.ApiError(415, "Send JSON")
+        return self.read_json_body()
+
+    def api_health(self):
+        self.send_json({
+            "ok": True,
+            "backend": "python",
+            "python": sys.version.split()[0],
+            "data_dir": app_api._db_path is not None,
+            "registration": app_api.REGISTRATION,
+        })
+
+    def api_account(self, route, query):
+        device = (self.headers.get("User-Agent") or "web")[:64]
+
+        if route == "/api/register":
+            payload, token = app_api.register(self.require_json_post(), device)
+            return self.send_json(payload, 201, cookie=token)
+
+        if route == "/api/login":
+            payload, token = app_api.login(self.require_json_post(), device)
+            return self.send_json(payload, cookie=token)
+
+        if route == "/api/logout":
+            payload = app_api.logout(self.presented_token())
+            return self.send_json(payload, clear_cookie=True)
+
+        if route == "/api/me":
+            user = app_api.user_for_token(self.presented_token())
+            return self.send_json({"user": None} if user is None else {
+                "user": {"username": user["username"], "displayName": user["display_name"]}
+            })
+
+        if route == "/api/password":
+            user = self.require_user()
+            return self.send_json(app_api.change_password(user, self.require_json_post()))
+
+        if route == "/api/sync":
+            user = self.require_user()
+            if self.command == "POST":
+                return self.send_json(app_api.sync(user, self.require_json_post(), None))
+            since = clamp_int((query.get("since") or ["0"])[0], 0, 2 ** 62, 0)
+            return self.send_json(app_api.sync(user, {}, since))
+
+        return self.send_json({"error": "Unknown endpoint"}, 404)
 
     # ---- API -------------------------------------------------------------
 
@@ -282,12 +388,23 @@ class Handler(BaseHTTPRequestHandler):
         if not self.head_only:
             self.wfile.write(body)
 
-    def send_json(self, payload: dict, status: int = 200):
+    def send_json(self, payload: dict, status: int = 200, cookie=None, clear_cookie=False):
         body = json.dumps(payload).encode()
         self.send_response(status)
         self.send_header("Content-Type", "application/json; charset=utf-8")
         self.send_header("Content-Length", str(len(body)))
         self.send_header("Cache-Control", "no-store")
+        if cookie is not None:
+            self.send_header(
+                "Set-Cookie",
+                f"{app_api.COOKIE_NAME}={cookie}; Path=/; Max-Age={app_api.TOKEN_TTL}; "
+                "HttpOnly; SameSite=Lax",
+            )
+        if clear_cookie:
+            self.send_header(
+                "Set-Cookie",
+                f"{app_api.COOKIE_NAME}=; Path=/; Max-Age=0; HttpOnly; SameSite=Lax",
+            )
         self.end_headers()
         if not self.head_only:
             self.wfile.write(body)
@@ -308,6 +425,8 @@ def main():
 
     mimetypes.add_type("application/javascript", ".js")
     mimetypes.add_type("image/svg+xml", ".svg")
+
+    app_api.configure(os.path.join(HERE, "data"))
 
     server = ThreadingHTTPServer((args.host, args.port), Handler)
     print(f"Serving {PUBLIC} on http://{args.host}:{args.port}", file=sys.stderr)

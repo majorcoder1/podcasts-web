@@ -5,3 +5,5 @@ node_modules/
 .wrangler/
 *.log
 podcast-web-upload.zip
+public/data/*
+!public/data/.htaccess

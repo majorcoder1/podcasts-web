@@ -1,0 +1,8 @@
+# The database and feed cache live here when the host will not let us write
+# above the document root. Nothing in this directory is ever served.
+Require all denied
+
+<IfModule !mod_authz_core.c>
+    Order allow,deny
+    Deny from all
+</IfModule>
