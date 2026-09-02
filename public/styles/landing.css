@@ -121,17 +121,165 @@ button { font: inherit; cursor: pointer; }
   box-shadow: 0 24px 60px rgb(7 31 61 / 32%);
 }
 .phone img { border-radius: 24px; width: 100%; }
-.phone-empty {
+/* The Home screen, rebuilt in markup rather than pasted in as a bitmap: it
+   stays crisp at any size, weighs a fraction of a screenshot, and follows the
+   viewer's light or dark theme like the real app does. */
+
+.shot {
+  --shot-surface: #ffffff;
+  --shot-on: #202124;
+  --shot-muted: #5f6368;
+  --shot-line: #e8eaed;
+  --shot-nav: #f1f3f4;
+  --shot-accent: #1a73e8;
+
   aspect-ratio: 9 / 19.5;
   border-radius: 24px;
-  background: var(--surface-alt);
-  display: grid;
-  place-items: center;
-  color: var(--on-surface-muted);
-  font-size: 14px;
-  text-align: center;
-  padding: 24px;
+  overflow: hidden;
+  background: var(--shot-surface);
+  color: var(--shot-on);
+  font-size: 9px;
+  line-height: 1.35;
+  display: flex;
+  flex-direction: column;
+  container-type: inline-size;
 }
+
+@media (prefers-color-scheme: dark) {
+  .shot {
+    --shot-surface: #202124;
+    --shot-on: #e8eaed;
+    --shot-muted: #9aa0a6;
+    --shot-line: #303134;
+    --shot-nav: #303134;
+    --shot-accent: #8ab4f8;
+  }
+}
+
+.shot svg { fill: currentColor; }
+
+.shot-status {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 14px 2px;
+  font-size: 9px;
+  font-weight: 500;
+}
+.shot-status-icons { display: flex; gap: 3px; }
+.shot-status svg { width: 9px; height: 9px; }
+
+.shot-appbar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px 10px;
+}
+.shot-title { flex: 1; font-size: 14px; font-weight: 500; }
+.shot-appbar svg { width: 13px; height: 13px; color: var(--shot-muted); }
+
+.shot-section { padding: 6px 12px 5px; font-size: 10px; font-weight: 500; }
+
+.shot-shelf {
+  display: flex;
+  gap: 6px;
+  padding: 0 12px 8px;
+  overflow: hidden;
+}
+.shot-shelf img {
+  width: 30%;
+  flex: none;
+  aspect-ratio: 1;
+  border-radius: 5px;
+  object-fit: cover;
+  background: var(--shot-line);
+}
+
+.shot-row {
+  display: flex;
+  gap: 8px;
+  padding: 7px 12px;
+  border-top: 1px solid var(--shot-line);
+}
+.shot-row img {
+  width: 34px;
+  height: 34px;
+  flex: none;
+  border-radius: 4px;
+  object-fit: cover;
+  background: var(--shot-line);
+}
+.shot-row-main { min-width: 0; flex: 1; }
+.shot-date { font-size: 7px; letter-spacing: 0.4px; color: var(--shot-muted); }
+.shot-ep {
+  font-size: 9.5px;
+  font-weight: 500;
+  margin: 1px 0 3px;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.shot-meta {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 8px;
+  color: var(--shot-muted);
+}
+
+/* A filled play triangle, drawn with borders so it needs no extra request. */
+.shot-play {
+  width: 0;
+  height: 0;
+  flex: none;
+  border-left: 7px solid var(--shot-accent);
+  border-top: 4.5px solid transparent;
+  border-bottom: 4.5px solid transparent;
+}
+
+.shot-track {
+  flex: 1;
+  height: 2px;
+  border-radius: 1px;
+  background: var(--shot-line);
+  overflow: hidden;
+}
+.shot-track > span { display: block; height: 100%; background: var(--shot-accent); }
+
+.shot-mini { margin-top: auto; border-top: 1px solid var(--shot-line); }
+.shot-mini-bar { height: 2px; background: var(--shot-line); }
+.shot-mini-bar > span { display: block; height: 100%; background: var(--shot-accent); }
+.shot-mini-body { display: flex; align-items: center; gap: 7px; padding: 6px 10px; }
+.shot-mini-body img { width: 26px; height: 26px; border-radius: 3px; object-fit: cover; }
+.shot-mini-text { flex: 1; min-width: 0; }
+.shot-mini-text strong {
+  display: block;
+  font-size: 9px;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.shot-mini-text span { font-size: 7.5px; color: var(--shot-muted); }
+.shot-mini-body svg { width: 13px; height: 13px; flex: none; }
+
+.shot-nav {
+  display: flex;
+  background: var(--shot-nav);
+  padding: 5px 0 7px;
+}
+.shot-nav span {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  font-size: 7.5px;
+  color: var(--shot-muted);
+}
+.shot-nav span.on { color: var(--shot-on); font-weight: 500; }
+.shot-nav svg { width: 13px; height: 13px; }
 
 /* ---- sections ---------------------------------------------------------- */
 

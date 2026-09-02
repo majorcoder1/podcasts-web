@@ -46,9 +46,93 @@
             <p class="hero-note">Free. No ads, no tracking, no algorithm deciding what you hear.</p>
           </div>
 
-          <div class="phone">
-            <div class="phone-empty" id="hero-shot">
-              Home · Explore · Activity<br />with the player docked below
+          <div class="phone" aria-label="The app's Home screen" role="img">
+            <div class="shot">
+              <div class="shot-status">
+                <span>9:41</span>
+                <span class="shot-status-icons">
+                  <svg viewBox="0 0 24 24"><path d="M4,20V16H7V20H4M9,20V12H12V20H9M14,20V8H17V20H14M19,20V4H22V20H19Z"/></svg>
+                  <svg viewBox="0 0 24 24"><path d="M12,21L15.6,16.2C14.6,15.45 13.35,15 12,15C10.65,15 9.4,15.45 8.4,16.2L12,21M12,3C7.95,3 4.21,4.34 1.2,6.6L3,9C5.5,7.12 8.62,6 12,6C15.38,6 18.5,7.12 21,9L22.8,6.6C19.79,4.34 16.05,3 12,3M12,9C9.3,9 6.81,9.89 4.8,11.4L6.6,13.8C8.1,12.67 9.97,12 12,12C14.03,12 15.9,12.67 17.4,13.8L19.2,11.4C17.19,9.89 14.7,9 12,9Z"/></svg>
+                  <svg viewBox="0 0 24 24"><path d="M16.67,4H14V2H10V4H7.33A1.33,1.33 0 0,0 6,5.33V20.67C6,21.4 6.6,22 7.33,22H16.67A1.33,1.33 0 0,0 18,20.67V5.33C18,4.6 17.4,4 16.67,4M16,18H8V6H16V18Z"/></svg>
+                </span>
+              </div>
+
+              <div class="shot-appbar">
+                <span class="shot-title">Podcasts</span>
+                <svg viewBox="0 0 24 24"><path d="M9.5,3A6.5,6.5 0 0,1 16,9.5C16,11.11 15.41,12.59 14.44,13.73L14.71,14H15.5L20.5,19L19,20.5L14,15.5V14.71L13.73,14.44C12.59,15.41 11.11,16 9.5,16A6.5,6.5 0 0,1 3,9.5A6.5,6.5 0 0,1 9.5,3M9.5,5C7,5 5,7 5,9.5C5,12 7,14 9.5,14C12,14 14,12 14,9.5C14,7 12,5 9.5,5Z"/></svg>
+                <svg viewBox="0 0 24 24"><path d="M12,19.2C9.5,19.2 7.29,17.92 6,16C6.03,14 10,12.9 12,12.9C14,12.9 17.97,14 18,16C16.71,17.92 14.5,19.2 12,19.2M12,5A3,3 0 0,1 15,8A3,3 0 0,1 12,11A3,3 0 0,1 9,8A3,3 0 0,1 12,5M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z"/></svg>
+              </div>
+
+              <div class="shot-section">Your subscriptions</div>
+              <div class="shot-shelf">
+                <img src="/img/shows/the-daily.jpg" alt="" />
+                <img src="/img/shows/crime-junkie.jpg" alt="" />
+                <img src="/img/shows/this-american-life.jpg" alt="" />
+                <img src="/img/shows/the-rest-is-history.jpg" alt="" />
+                <img src="/img/shows/smartless.jpg" alt="" />
+                <img src="/img/shows/dateline-nbc.jpg" alt="" />
+              </div>
+
+              <div class="shot-section">New episodes</div>
+
+              <div class="shot-row">
+                <img src="/img/shows/this-american-life.jpg" alt="" />
+                <div class="shot-row-main">
+                  <div class="shot-date">TODAY · THIS AMERICAN LIFE</div>
+                  <div class="shot-ep">896: I Know What You Need</div>
+                  <div class="shot-meta"><span class="shot-play"></span>1 hr 8 min</div>
+                </div>
+              </div>
+
+              <div class="shot-row">
+                <img src="/img/shows/the-rest-is-history.jpg" alt="" />
+                <div class="shot-row-main">
+                  <div class="shot-date">YESTERDAY · THE REST IS HISTORY</div>
+                  <div class="shot-ep">702. Roman Civil War: The Barbarian Invasion (Part 2)</div>
+                  <div class="shot-meta"><span class="shot-play"></span>42 min left
+                    <span class="shot-track"><span style="width:46%"></span></span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="shot-row">
+                <img src="/img/shows/smartless.jpg" alt="" />
+                <div class="shot-row-main">
+                  <div class="shot-date">MONDAY · SMARTLESS</div>
+                  <div class="shot-ep">"Steve Zahn"</div>
+                  <div class="shot-meta"><span class="shot-play"></span>22 min left
+                    <span class="shot-track"><span style="width:59%"></span></span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="shot-mini">
+                <div class="shot-mini-bar"><span style="width:38%"></span></div>
+                <div class="shot-mini-body">
+                  <img src="/img/shows/smartless.jpg" alt="" />
+                  <div class="shot-mini-text">
+                    <strong>"Steve Zahn"</strong>
+                    <span>22 min left</span>
+                  </div>
+                  <svg viewBox="0 0 24 24"><path d="M14,19H18V5H14M6,19H10V5H6V19Z"/></svg>
+                  <svg viewBox="0 0 24 24"><path d="M12,5V1L17,6L12,11V7A6,6 0 0,0 6,13A6,6 0 0,0 12,19A6,6 0 0,0 18,13H20A8,8 0 0,1 12,21A8,8 0 0,1 4,13A8,8 0 0,1 12,5Z"/></svg>
+                </div>
+              </div>
+
+              <div class="shot-nav">
+                <span class="on">
+                  <svg viewBox="0 0 24 24"><path d="M10,20V14H14V20H19V12H22L12,3L2,12H5V20H10Z"/></svg>
+                  Home
+                </span>
+                <span>
+                  <svg viewBox="0 0 24 24"><path d="M12,2A10,10 0 1,0 22,12A10,10 0 0,0 12,2M14.19,14.19L6,18L9.81,9.81L18,6L14.19,14.19M12,10.9A1.1,1.1 0 1,0 13.1,12A1.1,1.1 0 0,0 12,10.9Z"/></svg>
+                  Explore
+                </span>
+                <span>
+                  <svg viewBox="0 0 24 24"><path d="M4,6H2v14a2,2 0 0,0 2,2h14v-2H4V6M20,2H8A2,2 0 0,0 6,4v12a2,2 0 0,0 2,2h12a2,2 0 0,0 2-2V4a2,2 0 0,0-2-2M12,14.5v-5l4,2.5-4,2.5Z"/></svg>
+                  Activity
+                </span>
+              </div>
             </div>
           </div>
         </div>
