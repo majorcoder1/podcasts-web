@@ -149,6 +149,7 @@ class Handler(BaseHTTPRequestHandler):
     server_version = "PodcastsWeb"
     protocol_version = "HTTP/1.1"
     head_only = False
+    body = b""
 
     def log_message(self, fmt, *args):
         sys.stderr.write("%s - %s\n" % (self.address_string(), fmt % args))
@@ -174,6 +175,10 @@ class Handler(BaseHTTPRequestHandler):
         query = urllib.parse.parse_qs(parsed.query)
 
         try:
+            # Read the body here, always. On a keep-alive connection an unread
+            # request body stays in the socket and the next request parses
+            # starting from those leftover bytes.
+            self.body = self.drain_body()
             if route in ACCOUNT_ROUTES or route == "/api/sync":
                 return self.api_account(route, query)
             if route == "/api/health":
@@ -203,15 +208,26 @@ class Handler(BaseHTTPRequestHandler):
 
     # ---- accounts and sync -----------------------------------------------
 
-    def read_json_body(self):
+    def drain_body(self) -> bytes:
         length = int(self.headers.get("Content-Length") or 0)
         if length <= 0:
-            return {}
+            return b""
         if length > 8 * 1024 * 1024:
+            # Still consume it, or the connection is left desynchronised.
+            remaining = length
+            while remaining > 0:
+                chunk = self.rfile.read(min(65536, remaining))
+                if not chunk:
+                    break
+                remaining -= len(chunk)
             raise app_api.ApiError(413, "That request is too large")
-        raw = self.rfile.read(length)
+        return self.rfile.read(length)
+
+    def read_json_body(self):
+        if not self.body:
+            return {}
         try:
-            payload = json.loads(raw.decode("utf-8"))
+            payload = json.loads(self.body.decode("utf-8"))
         except (UnicodeDecodeError, json.JSONDecodeError):
             raise app_api.ApiError(400, "Body must be JSON") from None
         return payload if isinstance(payload, dict) else {}
@@ -343,8 +359,16 @@ class Handler(BaseHTTPRequestHandler):
         if os.path.isdir(target):
             target = os.path.join(target, "index.html")
         if not os.path.isfile(target):
-            # Single-page app: unknown paths render the shell and route client-side.
-            target = os.path.join(PUBLIC, "index.html")
+            # /app/* is the player, a single-page app, so its client-side routes
+            # must render the shell rather than 404.
+            if route == "/app" or route.startswith("/app/"):
+                target = os.path.join(PUBLIC, "app.html")
+            elif os.path.splitext(relative)[1]:
+                # A missing asset is a 404. Falling back to HTML here would hand
+                # the browser a page where it asked for JSON and hide the cause.
+                return self.send_json({"error": "Not found"}, 404)
+            else:
+                target = os.path.join(PUBLIC, "index.html")
 
         content_type, _ = mimetypes.guess_type(target)
         if target.endswith(".webmanifest"):

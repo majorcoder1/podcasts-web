@@ -2,29 +2,188 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-    <title>Podcasts</title>
-    <meta name="description" content="A podcast player: subscribe to any RSS feed, queue episodes, download for offline, and pick up where you left off." />
-    <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)" />
-    <meta name="theme-color" content="#202124" media="(prefers-color-scheme: dark)" />
-    <link rel="manifest" href="/manifest.webmanifest" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Podcasts — 4 The People Media</title>
+    <meta name="description" content="A podcast player that keeps your subscriptions, queue and place in every episode in sync between your phone and your browser. Any RSS feed, no tracking, yours." />
+    <meta name="theme-color" content="#0a3161" />
     <link rel="icon" href="/icon.svg" type="image/svg+xml" />
     <link rel="apple-touch-icon" href="/icon.svg" />
-    <link rel="stylesheet" href="/styles/app.css" />
+    <link rel="stylesheet" href="/styles/landing.css" />
+
+    <meta property="og:title" content="Podcasts — 4 The People Media" />
+    <meta property="og:description" content="Your subscriptions, queue and place in every episode, in sync between phone and browser." />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://podcast.4thepeople.live/" />
   </head>
   <body>
-    <div id="app">
-      <main id="screen" class="screen"></main>
-    </div>
+    <header class="site-header">
+      <div class="wrap">
+        <span class="brand"><img src="/icon.svg" alt="" /> Podcasts</span>
+        <nav>
+          <a class="btn btn-ghost btn-small" href="#download">Get the app</a>
+          <a class="btn btn-primary btn-small" href="#account" id="nav-cta">Sign in</a>
+        </nav>
+      </div>
+    </header>
 
-    <div class="bottom-dock">
-      <div id="mini-player" class="mini-player hidden"></div>
-      <nav class="navbar" id="navbar" aria-label="Main"></nav>
-    </div>
+    <main>
+      <section class="hero">
+        <div class="wrap hero-grid">
+          <div>
+            <h1>Your podcasts, on every screen you own.</h1>
+            <p class="lede">
+              Subscribe to any show on the open podcast directory — or paste a raw RSS
+              feed nobody else will carry. Your queue and your place in every episode
+              follow you from the phone in your pocket to the browser on your desk.
+            </p>
+            <div class="hero-actions">
+              <a class="btn btn-navy" href="#download">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5,20H19V18H5M19,9H15V3H9V9H5L12,16L19,9Z"/></svg>
+                Download for Android
+              </a>
+              <a class="btn btn-primary" href="/app" id="hero-open">Open the web app</a>
+            </div>
+            <p class="hero-note">Free. No ads, no tracking, no algorithm deciding what you hear.</p>
+          </div>
 
-    <section id="player-sheet" class="player-sheet" aria-hidden="true"></section>
-    <div id="toast" class="toast" role="status" aria-live="polite"></div>
+          <div class="phone">
+            <div class="phone-empty" id="hero-shot">
+              Home · Explore · Activity<br />with the player docked below
+            </div>
+          </div>
+        </div>
+      </section>
 
-    <script type="module" src="/js/main.js"></script>
+      <section class="alt">
+        <div class="wrap">
+          <h2 class="section-title">Everything the old one did</h2>
+          <p class="section-sub">
+            Built to replace Google Podcasts after it shut down in 2024 — the same
+            three-tab layout and the same habits, running on plain RSS.
+          </p>
+
+          <div class="features">
+            <div class="feature">
+              <div class="icon"><svg viewBox="0 0 24 24"><path d="M12,2A5,5 0 0,0 7,7V13A5,5 0 0,0 17,13V7A5,5 0 0,0 12,2M12,4A3,3 0 0,1 15,7V13A3,3 0 0,1 9,13V7A3,3 0 0,1 12,4M5,12H3A9,9 0 0,0 11,20.94V23H13V20.94A9,9 0 0,0 21,12H19A7,7 0 0,1 5,12Z"/></svg></div>
+              <h3>Any feed, no gatekeeper</h3>
+              <p>Search the directory, or paste an RSS URL directly. If a show publishes a feed, it plays here.</p>
+            </div>
+            <div class="feature">
+              <div class="icon"><svg viewBox="0 0 24 24"><path d="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M12,20A8,8 0 0,1 4,12A8,8 0 0,1 12,4A8,8 0 0,1 20,12A8,8 0 0,1 12,20M12.5,7H11V13L15.75,15.85L16.5,14.62L12.5,12.25V7Z"/></svg></div>
+              <h3>Never lose your place</h3>
+              <p>Pause on the phone at the bus stop, pick it up in the browser at the same second.</p>
+            </div>
+            <div class="feature">
+              <div class="icon"><svg viewBox="0 0 24 24"><path d="M2,16H10V18H2V16M2,11H14V13H2V11M2,6H14V8H2V6M16,13V16H13V18H16V21H18V18H21V16H18V13H16Z"/></svg></div>
+              <h3>A real queue</h3>
+              <p>Add to the end, or jump something to the front with Play next. It plays straight through.</p>
+            </div>
+            <div class="feature">
+              <div class="icon"><svg viewBox="0 0 24 24"><path d="M5,20H19V18H5M19,9H15V3H9V9H5L12,16L19,9Z"/></svg></div>
+              <h3>Listen offline</h3>
+              <p>Download episodes on Wi-Fi and play them with no signal. They clear themselves once you're done.</p>
+            </div>
+            <div class="feature">
+              <div class="icon"><svg viewBox="0 0 24 24"><path d="M12,5V1L17,6L12,11V7A6,6 0 0,0 6,13A6,6 0 0,0 12,19A6,6 0 0,0 18,13H20A8,8 0 0,1 12,21A8,8 0 0,1 4,13A8,8 0 0,1 12,5Z"/></svg></div>
+              <h3>Speed and sleep timer</h3>
+              <p>Half speed to triple. Sleep timer with the usual presets, or stop at the end of the episode.</p>
+            </div>
+            <div class="feature">
+              <div class="icon"><svg viewBox="0 0 24 24"><path d="M14,12L10,8V11H2V13H10V16M20,18V6A2,2 0 0,0 18,4H13V6H18V18H13V20H18A2,2 0 0,0 20,18Z"/></svg></div>
+              <h3>Bring your list with you</h3>
+              <p>Import an OPML export from any other app — including your old Google Podcasts export — in one go.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="download">
+        <div class="wrap">
+          <h2 class="section-title">Get it on Android</h2>
+          <p class="section-sub">
+            Installed straight from here, not a store. That means you decide what runs
+            on your phone — and it means Android will ask you to confirm.
+          </p>
+
+          <div class="download-card">
+            <img class="mark" src="/icon.svg" alt="" />
+            <div>
+              <h3>Podcasts for Android</h3>
+              <p>Requires Android 7.0 or newer. Plays in the background with lock-screen controls.</p>
+              <div class="download-meta" id="apk-meta">Checking for the latest build…</div>
+            </div>
+            <a class="btn btn-download" id="apk-link" href="/download/podcasts.apk" download>
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5,20H19V18H5M19,9H15V3H9V9H5L12,16L19,9Z"/></svg>
+              Download APK
+            </a>
+          </div>
+
+          <ol class="steps">
+            <li><strong>Tap Download APK.</strong> Your browser will warn you that this kind of file can harm your device — that warning appears for every APK, including this one.</li>
+            <li><strong>Open the downloaded file.</strong> Android will ask whether to allow installs from your browser. Turn it on for that app only.</li>
+            <li><strong>Install, then sign in</strong> with the same account you use here, and your subscriptions arrive on their own.</li>
+          </ol>
+        </div>
+      </section>
+
+      <section class="alt" id="account">
+        <div class="wrap account-grid">
+          <div>
+            <h2 class="section-title">One account, both devices</h2>
+            <p class="section-sub">
+              Your account exists so your listening can follow you. Subscriptions, queue
+              and playback position sync between the phone app and this site.
+            </p>
+            <p style="color: var(--on-surface-muted); font-size: 15px; margin: 0;">
+              Accounts are on this server only. Nothing is shared with anyone, there is
+              no advertising ID, and no third party is told what you listen to.
+            </p>
+          </div>
+
+          <div class="card" id="account-card">
+            <div class="tabs-row" role="tablist">
+              <button role="tab" id="tab-signin" aria-selected="true">Sign in</button>
+              <button role="tab" id="tab-register" aria-selected="false">Create account</button>
+            </div>
+
+            <p class="form-message" id="form-message" role="status"></p>
+
+            <form id="auth-form" autocomplete="on">
+              <div class="field">
+                <label for="username">Username</label>
+                <input id="username" name="username" type="text" autocomplete="username"
+                       autocapitalize="none" spellcheck="false" required />
+              </div>
+
+              <div class="field">
+                <label for="password">Password</label>
+                <input id="password" name="password" type="password"
+                       autocomplete="current-password" required />
+                <div class="hint" id="password-hint" hidden>At least 8 characters.</div>
+              </div>
+
+              <div class="field" id="invite-field" hidden>
+                <label for="invite">Invite code</label>
+                <input id="invite" name="invite" type="text" autocapitalize="none" spellcheck="false" />
+                <div class="hint">Ask Aaron for the code if you don't have one.</div>
+              </div>
+
+              <button class="btn btn-primary" type="submit" id="submit" style="width: 100%">
+                Sign in
+              </button>
+            </form>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <div class="wrap">
+        <span>Built by <a href="https://4thepeople.live">4 The People Media</a>, Crossville TN.</span>
+        <span>Runs on RSS. Not affiliated with Google.</span>
+      </div>
+    </footer>
+
+    <script type="module" src="/js/landing.js"></script>
   </body>
 </html>

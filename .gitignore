@@ -7,3 +7,5 @@ node_modules/
 podcast-web-upload.zip
 public/data/*
 !public/data/.htaccess
+public/download/*.apk
+public/download/release.json

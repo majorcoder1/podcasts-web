@@ -1,10 +1,14 @@
 // App-shell cache so the player keeps working offline. Downloaded episode audio
 // lives in its own cache, written by js/downloads.js, and is never purged here.
 
-const SHELL = 'shell-v1';
+const SHELL = 'shell-v2';
 const SHELL_FILES = [
   '/',
   '/index.html',
+  '/app.html',
+  '/styles/landing.css',
+  '/js/landing.js',
+  '/js/account.js',
   '/manifest.webmanifest',
   '/icon.svg',
   '/styles/app.css',
@@ -62,11 +66,11 @@ self.addEventListener('fetch', (event) => {
   // Feed and search responses must stay live; only the shell is cached.
   if (url.pathname.startsWith('/api/')) return;
 
-  // Navigations fall back to the cached shell when the network is gone.
+  // Navigations fall back to the cached shell when the network is gone. The
+  // player and the landing page are different documents, so pick by path.
   if (request.mode === 'navigate') {
-    event.respondWith(
-      fetch(request).catch(() => caches.match('/index.html')),
-    );
+    const shell = url.pathname.startsWith('/app') ? '/app.html' : '/index.html';
+    event.respondWith(fetch(request).catch(() => caches.match(shell)));
     return;
   }
 

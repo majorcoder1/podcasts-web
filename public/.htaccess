@@ -13,11 +13,17 @@
     # /api/<name> -> api.php, which routes on the last path segment.
     RewriteRule ^api/(health|register|login|logout|me|password|sync|feed|search|charts|audio)/?$ api.php [QSA,L]
 
-    # Single-page app: any path that is not a real file renders the shell and
-    # routes client-side, so /show/... survives a refresh or a shared link.
+    # The player is a single-page app mounted at /app, so /app/show/... has to
+    # survive a refresh or a shared link.
+    RewriteRule ^app(/.*)?$ app.html [L]
+
+    # Anything else that is not a real file falls back to the landing page -
+    # except requests that name a file. A missing asset must 404, not return
+    # HTML where the browser asked for JSON.
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteCond %{REQUEST_FILENAME} !-d
     RewriteCond %{REQUEST_URI} !^/api/
+    RewriteCond %{REQUEST_URI} !\.[a-zA-Z0-9]{2,5}$
     RewriteRule . index.html [L]
 </IfModule>
 
@@ -25,6 +31,7 @@
     AddType application/manifest+json .webmanifest
     AddType image/svg+xml            .svg
     AddType text/javascript          .js
+    AddType application/vnd.android.package-archive .apk
 </IfModule>
 
 <IfModule mod_deflate.c>
@@ -38,6 +45,12 @@
 <IfModule mod_headers.c>
     <FilesMatch "\.(html|js|css|webmanifest)$">
         Header set Cache-Control "no-cache"
+    </FilesMatch>
+
+    # The APK is immutable once published; a new build gets a new filename.
+    <FilesMatch "\.apk$">
+        Header set Cache-Control "public, max-age=86400"
+        Header set Content-Disposition "attachment"
     </FilesMatch>
     <FilesMatch "^sw\.js$">
         Header set Cache-Control "no-cache"

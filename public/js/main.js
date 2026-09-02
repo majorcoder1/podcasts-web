@@ -4,6 +4,7 @@ import * as store from './store.js';
 import * as player from './player.js';
 import * as downloads from './downloads.js';
 import * as chrome from './chrome.js';
+import * as account from './account.js';
 import { onAction, toast } from './dom.js';
 
 import * as home from './views/home.js';
@@ -30,14 +31,19 @@ function applyTheme(theme) {
 
 // ---- routing ----------------------------------------------------------------
 
+/** The app is mounted under /app; '/' is the landing page. */
+export const BASE = '/app';
+
 function currentRoute() {
-  return location.pathname || '/';
+  const path = location.pathname.replace(/^\/app/, '');
+  return path === '' || path === '/' ? '/' : path;
 }
 
 function navigate(route, replace = false) {
   if (route === currentRoute()) return render();
-  if (replace) history.replaceState({}, '', route);
-  else history.pushState({}, '', route);
+  const url = route === '/' ? BASE + '/' : BASE + route;
+  if (replace) history.replaceState({}, '', url);
+  else history.pushState({}, '', url);
   render();
 }
 
@@ -172,6 +178,14 @@ async function maybeRefresh() {
 // ---- boot -------------------------------------------------------------------
 
 async function boot() {
+  // The app is behind an account. Anyone not signed in belongs on the landing
+  // page, which is where signing in happens.
+  const session = await account.currentUser();
+  if (!session) {
+    location.replace('/?next=' + encodeURIComponent(location.pathname));
+    return;
+  }
+
   const settings_ = await store.getSettings();
   applyTheme(settings_.theme);
 
