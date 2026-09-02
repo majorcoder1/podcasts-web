@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>Podcasts</title>
+    <meta name="description" content="A podcast player: subscribe to any RSS feed, queue episodes, download for offline, and pick up where you left off." />
+    <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#202124" media="(prefers-color-scheme: dark)" />
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <link rel="icon" href="/icon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/icon.svg" />
+    <link rel="stylesheet" href="/styles/app.css" />
+  </head>
+  <body>
+    <div id="app">
+      <main id="screen" class="screen"></main>
+    </div>
+
+    <div class="bottom-dock">
+      <div id="mini-player" class="mini-player hidden"></div>
+      <nav class="navbar" id="navbar" aria-label="Main"></nav>
+    </div>
+
+    <section id="player-sheet" class="player-sheet" aria-hidden="true"></section>
+    <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+    <script type="module" src="/js/main.js"></script>
+  </body>
+</html>

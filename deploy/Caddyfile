@@ -1,0 +1,22 @@
+# Caddy gets TLS for podcast.4thpeople.live automatically.
+#
+#   sudo cp deploy/Caddyfile /etc/caddy/Caddyfile
+#   sudo systemctl reload caddy
+
+podcast.4thpeople.live {
+	encode zstd gzip
+
+	# Downloading an episode streams a whole audio file through the proxy.
+	reverse_proxy 127.0.0.1:8080 {
+		flush_interval -1
+	}
+
+	header {
+		Strict-Transport-Security "max-age=31536000; includeSubDomains"
+		X-Content-Type-Options "nosniff"
+		Referrer-Policy "no-referrer"
+		# The app is entirely self-hosted except for podcast artwork and audio,
+		# which come straight from publishers.
+		Content-Security-Policy "default-src 'self'; img-src 'self' https: data:; media-src 'self' https: blob:; connect-src 'self' https:; script-src 'self'; style-src 'self'; base-uri 'none'; frame-ancestors 'none'"
+	}
+}

@@ -1,0 +1,13 @@
+name = "podcast-4thpeople"
+main = "worker.js"
+compatibility_date = "2025-01-01"
+
+[assets]
+directory = "./public"
+binding = "ASSETS"
+# Unknown paths fall through to the Worker, which serves the SPA shell.
+not_found_handling = "none"
+
+[[routes]]
+pattern = "podcast.4thpeople.live"
+custom_domain = true
