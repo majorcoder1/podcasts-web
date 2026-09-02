@@ -1,9 +1,9 @@
-# Caddy gets TLS for podcast.4thpeople.live automatically.
+# Caddy gets TLS for podcast.4thepeople.live automatically.
 #
 #   sudo cp deploy/Caddyfile /etc/caddy/Caddyfile
 #   sudo systemctl reload caddy
 
-podcast.4thpeople.live {
+podcast.4thepeople.live {
 	encode zstd gzip
 
 	# Downloading an episode streams a whole audio file through the proxy.

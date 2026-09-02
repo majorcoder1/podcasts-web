@@ -4,3 +4,4 @@ __pycache__/
 node_modules/
 .wrangler/
 *.log
+podcast-web-upload.zip

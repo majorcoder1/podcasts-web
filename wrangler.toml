@@ -9,5 +9,5 @@ binding = "ASSETS"
 not_found_handling = "none"
 
 [[routes]]
-pattern = "podcast.4thpeople.live"
+pattern = "podcast.4thepeople.live"
 custom_domain = true

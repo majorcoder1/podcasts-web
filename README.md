@@ -4,7 +4,7 @@ A podcast player for the browser, rebuilding the feature set and interaction
 model of Google Podcasts, which shut down in 2024. Companion to the Android
 build; same app, same layout, same behaviour.
 
-Deployed at **podcast.4thpeople.live**.
+Deployed at **podcast.4thepeople.live**.
 
 This is original code. Google Podcasts was never open source and none of its
 code, assets, or branding are used here — it runs on RSS, which is what the
@@ -47,6 +47,7 @@ through a small same-origin proxy:
 | `/api/search?q=` | Directory search |
 | `/api/charts?genre=` | Category charts |
 | `/api/audio?url=` | Only for downloads — streaming plays straight from the publisher |
+| `/api/health` | Reports what the host supports; check it first after uploading |
 
 The proxy refuses non-http(s) schemes and any host that resolves to private,
 loopback or link-local space, re-checking on every redirect hop. Without that, a
@@ -54,32 +55,57 @@ public `?url=` endpoint would let any visitor probe the machine's own network.
 
 ## Deploying
 
-Two backends, same front end. Pick one.
+The front end is the same everywhere; only the proxy differs. Three backends
+ship, in the order you are most likely to want them.
 
-### Self-hosted (Python 3.9+, no dependencies)
+### Shared hosting — what podcast.4thepeople.live runs on
+
+`public/` is the whole site: static files plus `api.php`, the proxy. No daemon,
+no root, no Node. Works on any host with PHP and `.htaccess`.
+
+**First, give the subdomain its own document root.** Right now
+`podcast.4thepeople.live` is served by wildcard DNS and shows the apex site.
+In the hosting control panel add it as a subdomain pointing at a new folder,
+e.g. `/public_html/podcast/`.
+
+> Do not upload into the existing web root. The apex serves another site and
+> these files would land on top of it.
+
+Then upload the *contents* of `public/` into that folder — `index.html` must sit
+at the folder's top level, not inside a nested `public/`.
+
+**Check the host before anything else:**
+
+```bash
+curl -s https://podcast.4thepeople.live/api/health
+```
+
+That reports the PHP version, whether cURL is available, and whether the feed
+cache directory is writable. `"curl": true` is the one that matters; the code
+falls back to streams, but only if `allow_url_fopen` is on.
+
+If `.htaccess` is ignored (some hosts run nginx), the rewrites will not fire and
+the app will 404 on refresh. Say so and the routes can move to query strings
+instead.
+
+### VPS with root
 
 ```bash
 python3 server.py --port 8080
 ```
 
-Then put it behind TLS — `deploy/Caddyfile` or `deploy/nginx.conf` — and run it
-under `deploy/podcast-web.service`:
-
-```bash
-sudo cp -r . /srv/podcast-web && sudo cp deploy/podcast-web.service /etc/systemd/system/ && sudo systemctl enable --now podcast-web
-```
+Behind `deploy/Caddyfile` or `deploy/nginx.conf`, running under
+`deploy/podcast-web.service`. Zero dependencies, Python 3.9+.
 
 ### Cloudflare
 
 `worker.js` answers the same routes and serves `public/` from the assets
-binding. Point the custom domain at it in `wrangler.toml`, then:
+binding. Note this moves the domain's DNS to Cloudflare, away from
+`serverbyt.net`.
 
 ```bash
 npx wrangler deploy
 ```
-
-DNS either way: an `A`/`AAAA` record for `podcast` at `4thpeople.live` pointing
-at the host, or the custom-domain binding if you go the Cloudflare route.
 
 ## Front end
 
@@ -89,6 +115,7 @@ copying `public/`.
 ```
 public/
 ├── index.html, sw.js, manifest.webmanifest, icon.svg
+├── api.php, .htaccess   the shared-hosting backend
 ├── styles/app.css
 └── js/
     ├── main.js        router, shared episode actions

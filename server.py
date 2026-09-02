@@ -231,6 +231,9 @@ class Handler(BaseHTTPRequestHandler):
         target = os.path.normpath(os.path.join(PUBLIC, relative))
         if not target.startswith(PUBLIC):
             return self.send_json({"error": "Not found"}, 404)
+        # Apache hides .htaccess and friends; this server should too.
+        if any(part.startswith(".") for part in relative.split("/") if part):
+            return self.send_json({"error": "Not found"}, 404)
         if os.path.isdir(target):
             target = os.path.join(target, "index.html")
         if not os.path.isfile(target):

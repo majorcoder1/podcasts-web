@@ -1,0 +1,67 @@
+# Shared-hosting config for the podcast app.
+#
+# The document root for podcast.4thepeople.live should point at this folder.
+# Everything here is static except api.php, which is the same-origin proxy the
+# front end needs because podcast feeds send no CORS headers.
+#
+# The host already redirects http -> https, so there is deliberately no HTTPS
+# rewrite here: adding one behind a load balancer is how you get a loop.
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    # /api/<name> -> api.php, which routes on the last path segment.
+    RewriteRule ^api/(health|feed|search|charts|audio)/?$ api.php [QSA,L]
+
+    # Single-page app: any path that is not a real file renders the shell and
+    # routes client-side, so /show/... survives a refresh or a shared link.
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteCond %{REQUEST_URI} !^/api/
+    RewriteRule . index.html [L]
+</IfModule>
+
+<IfModule mod_mime.c>
+    AddType application/manifest+json .webmanifest
+    AddType image/svg+xml            .svg
+    AddType text/javascript          .js
+</IfModule>
+
+<IfModule mod_deflate.c>
+    AddOutputFilterByType DEFLATE text/html text/css text/javascript \
+        application/javascript application/json image/svg+xml application/manifest+json
+</IfModule>
+
+# The app ships unversioned module paths, so assets must revalidate or a
+# re-upload would not reach anyone still holding a cached copy. Apache's ETags
+# turn each revalidation into a cheap 304.
+<IfModule mod_headers.c>
+    <FilesMatch "\.(html|js|css|webmanifest)$">
+        Header set Cache-Control "no-cache"
+    </FilesMatch>
+    <FilesMatch "^sw\.js$">
+        Header set Cache-Control "no-cache"
+        Header set Service-Worker-Allowed "/"
+    </FilesMatch>
+    <FilesMatch "\.(svg|png|jpg|jpeg|webp|ico)$">
+        Header set Cache-Control "public, max-age=604800"
+    </FilesMatch>
+
+    Header always set X-Content-Type-Options "nosniff"
+    Header always set Referrer-Policy "no-referrer"
+    Header always set X-Frame-Options "SAMEORIGIN"
+</IfModule>
+
+# Artwork and audio come straight from publishers; everything else is ours.
+<IfModule mod_headers.c>
+    <FilesMatch "\.html$">
+        Header set Content-Security-Policy "default-src 'self'; img-src 'self' https: data:; media-src 'self' https: blob:; connect-src 'self' https:; script-src 'self'; style-src 'self'; base-uri 'none'; frame-ancestors 'self'"
+    </FilesMatch>
+</IfModule>
+
+<IfModule mod_dir.c>
+    DirectoryIndex index.html index.php
+</IfModule>
+
+# Nothing here should ever be listed.
+Options -Indexes
