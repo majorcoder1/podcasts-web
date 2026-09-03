@@ -20,7 +20,6 @@ import re
 import shutil
 import subprocess
 import sys
-import zipfile
 
 HERE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DOWNLOAD_DIR = os.path.join(HERE, "public", "download")
@@ -57,12 +56,45 @@ def read_version(apk: str) -> tuple[str, str]:
     return "1.0.0", ""
 
 
-def is_signed(apk: str) -> bool:
-    with zipfile.ZipFile(apk) as archive:
-        names = archive.namelist()
-    # v2/v3 signatures live in the zip's signing block rather than META-INF, so
-    # treat either marker as signed and let apksigner be the real check.
-    return any(n.startswith("META-INF/") and n.endswith((".RSA", ".EC", ".DSA")) for n in names)
+def signing_status(apk: str) -> str:
+    """
+    Ask apksigner. Looking for META-INF/*.RSA only finds v1 JAR signing, and a
+    modern build is v2-only - that check reports an unsigned APK for a
+    perfectly good one.
+    """
+    sdk = os.environ.get("ANDROID_HOME") or os.path.expanduser("~/Android/Sdk")
+    candidates = sorted(
+        (
+            os.path.join(sdk, "build-tools", version, "apksigner")
+            for version in os.listdir(os.path.join(sdk, "build-tools"))
+        ),
+        reverse=True,
+    ) if os.path.isdir(os.path.join(sdk, "build-tools")) else []
+
+    for apksigner in candidates:
+        if not os.path.isfile(apksigner):
+            continue
+        try:
+            result = subprocess.run(
+                [apksigner, "verify", "--verbose", "--print-certs", apk],
+                capture_output=True, text=True, timeout=120,
+            )
+        except (subprocess.SubprocessError, OSError):
+            continue
+        if result.returncode != 0:
+            return "NOT SIGNED - " + (result.stderr.strip().splitlines() or ["unknown"])[0]
+        schemes = [
+            line.split()[2].rstrip(":")
+            for line in result.stdout.splitlines()
+            if line.startswith("Verified using") and line.strip().endswith("true")
+        ]
+        owner = next(
+            (line.split("DN:", 1)[1].strip()
+             for line in result.stdout.splitlines() if "certificate DN:" in line),
+            "unknown",
+        )
+        return f"signed ({', '.join(schemes) or 'unknown scheme'}) as {owner}"
+    return "unverified - apksigner not found"
 
 
 def main() -> int:
@@ -112,7 +144,7 @@ def main() -> int:
     print(f"  version  {version} ({code or 'no code'})")
     print(f"  size     {release['size'] / 1e6:.1f} MB")
     print(f"  sha256   {release['sha256']}")
-    print(f"  signed   {is_signed(target)}")
+    print(f"  signing  {signing_status(target)}")
     return 0
 
 

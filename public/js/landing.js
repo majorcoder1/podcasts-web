@@ -142,15 +142,21 @@ async function loadRelease() {
     if (release.version) parts.push(`Version ${release.version}`);
     if (release.size) parts.push(formatBytes(release.size));
     if (release.released) {
-      parts.push(new Date(release.released).toLocaleDateString(undefined, {
+      // A bare YYYY-MM-DD parses as UTC midnight, which renders as the previous
+      // day anywhere west of Greenwich. Build it as a local date instead.
+      const [year, month, day] = release.released.split('-').map(Number);
+      parts.push(new Date(year, month - 1, day).toLocaleDateString(undefined, {
         year: 'numeric', month: 'short', day: 'numeric',
       }));
     }
-    meta.textContent = parts.join(' · ');
+    meta.textContent = '';
+    const summary = document.createElement('div');
+    summary.textContent = parts.join(' · ');
+    meta.appendChild(summary);
 
     if (release.sha256) {
       const line = document.createElement('div');
-      line.style.cssText = 'margin-top:6px;word-break:break-all;font-size:11px';
+      line.style.cssText = 'margin-top:6px;word-break:break-all;font-size:11px;opacity:.75';
       line.textContent = `SHA-256 ${release.sha256}`;
       meta.appendChild(line);
     }
