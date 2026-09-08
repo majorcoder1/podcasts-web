@@ -37,7 +37,7 @@ PUBLIC = os.path.join(HERE, "public")
 
 USER_AGENT = "PodcastsWeb/1.0 (+https://github.com/)"
 FETCH_TIMEOUT = 20
-MAX_FEED_BYTES = 12 * 1024 * 1024
+MAX_FEED_BYTES = 32 * 1024 * 1024   # 32 MB: a daily show with years of back catalogue genuinely runs this big
 MAX_REDIRECTS = 5
 
 ITUNES_SEARCH = "https://itunes.apple.com/search"

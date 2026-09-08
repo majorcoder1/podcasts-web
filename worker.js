@@ -10,7 +10,7 @@
 const USER_AGENT = 'PodcastsWeb/1.0 (+https://github.com/)';
 const ITUNES_SEARCH = 'https://itunes.apple.com/search';
 const ITUNES_CHARTS = 'https://itunes.apple.com/us/rss/toppodcasts';
-const MAX_FEED_BYTES = 12 * 1024 * 1024;
+const MAX_FEED_BYTES = 32 * 1024 * 1024; // 32 MB: a daily show with years of back catalogue genuinely runs this big
 
 /**
  * Workers cannot reach RFC1918 space, but a visitor-supplied URL should still

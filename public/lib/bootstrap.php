@@ -13,7 +13,7 @@ if (!defined('PODCAST_APP')) {
 
 const USER_AGENT      = 'PodcastsWeb/1.0 (+https://podcast.4thepeople.live)';
 const FETCH_TIMEOUT   = 20;
-const MAX_FEED_BYTES  = 12582912;        // 12 MB
+const MAX_FEED_BYTES  = 33554432;        // 32 MB: a daily show with years of back catalogue genuinely runs this big
 const MAX_AUDIO_BYTES = 419430400;       // 400 MB
 const MAX_REDIRECTS   = 5;
 const FEED_CACHE_TTL  = 300;
