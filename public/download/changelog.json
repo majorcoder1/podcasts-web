@@ -1,0 +1,35 @@
+[
+  {
+    "date": "2026-09-24",
+    "version": "1.0.3",
+    "changes": [
+      "Security update for the Android app: closed links other apps could open for no reason, and only trusted apps can now see or control what is playing.",
+      "Updated every part the app is built on, including the audio player, to current versions.",
+      "Fixed a white screen and a lost episode after pausing for a long time.",
+      "Episode artwork is sharp again on the player and the lock screen.",
+      "Long-press the app icon for Resume, New episodes, Queue and Explore.",
+      "Website: stronger protection for the server, and episode downloads no longer strain it.",
+      "Website: easier to find in search, and shared links now show a preview picture.",
+      "Website: works better with a keyboard and screen readers, and respects the reduce-motion setting."
+    ]
+  },
+  {
+    "date": "2026-09-08",
+    "version": "1.0.1",
+    "changes": [
+      "Fixed shows that could stop getting new episodes.",
+      "Refresh in a show's menu now always loads the feed fresh.",
+      "The website handles very large feeds, up to 32 MB."
+    ]
+  },
+  {
+    "date": "2026-09-02",
+    "version": "1.0.0",
+    "changes": [
+      "First release of the Android app and the web player.",
+      "Subscribe to any podcast feed, keep a queue, and download episodes for offline listening.",
+      "Playback speed, sleep timer, and import or export of your show list.",
+      "One account keeps your shows and your place in sync between phone and browser."
+    ]
+  }
+]

@@ -152,6 +152,81 @@ function formatBytes(bytes) {
   return `${value.toFixed(unit >= 2 ? 1 : 0)} ${BYTES[unit]}`;
 }
 
+/**
+ * A bare YYYY-MM-DD parses as UTC midnight, which renders as the previous day
+ * anywhere west of Greenwich. Build it as a local date instead.
+ */
+function formatDate(iso, month = 'short') {
+  const [year, monthIndex, day] = iso.split('-').map(Number);
+  return new Date(year, monthIndex - 1, day).toLocaleDateString(undefined, {
+    year: 'numeric', month, day: 'numeric',
+  });
+}
+
+/**
+ * The release date doubles as the way into the change history: clicking it
+ * opens the list of every update underneath. With no history file on the
+ * server it stays plain text.
+ */
+async function releaseDate(iso, container) {
+  let history = [];
+  try {
+    const response = await fetch('/download/changelog.json', { cache: 'no-cache' });
+    if (response.ok) history = await response.json();
+  } catch {
+    // No history to show; the date still reads fine on its own.
+  }
+  if (!Array.isArray(history) || history.length === 0) {
+    return formatDate(iso);
+  }
+
+  const toggle = document.createElement('button');
+  toggle.type = 'button';
+  toggle.className = 'date-toggle';
+  toggle.textContent = formatDate(iso);
+  toggle.setAttribute('aria-expanded', 'false');
+  toggle.setAttribute('aria-controls', 'changelog');
+  toggle.title = 'What changed';
+  toggle.setAttribute('aria-label', `${toggle.textContent}, see what changed`);
+
+  const panel = document.createElement('div');
+  panel.id = 'changelog';
+  panel.className = 'changelog';
+  panel.hidden = true;
+  panel.setAttribute('aria-label', 'What changed in each update');
+  panel.setAttribute('role', 'region');
+  panel.tabIndex = 0;   // it can scroll, so keyboard users must be able to reach it
+
+  for (const entry of history) {
+    if (!entry || !entry.date || !Array.isArray(entry.changes)) continue;
+    const heading = document.createElement('h4');
+    heading.textContent = formatDate(entry.date, 'long')
+      + (entry.version ? ` — version ${entry.version}` : '');
+    const list = document.createElement('ul');
+    for (const change of entry.changes) {
+      const item = document.createElement('li');
+      item.textContent = String(change);
+      list.appendChild(item);
+    }
+    panel.append(heading, list);
+  }
+  container.appendChild(panel);
+
+  toggle.addEventListener('click', () => {
+    const open = panel.hidden;
+    panel.hidden = !open;
+    toggle.setAttribute('aria-expanded', String(open));
+  });
+  panel.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape') {
+      panel.hidden = true;
+      toggle.setAttribute('aria-expanded', 'false');
+      toggle.focus();
+    }
+  });
+  return toggle;
+}
+
 async function loadRelease() {
   const meta = document.getElementById('apk-meta');
   const link = document.getElementById('apk-link');
@@ -165,18 +240,16 @@ async function loadRelease() {
     const parts = [];
     if (release.version) parts.push(`Version ${release.version}`);
     if (release.size) parts.push(formatBytes(release.size));
-    if (release.released) {
-      // A bare YYYY-MM-DD parses as UTC midnight, which renders as the previous
-      // day anywhere west of Greenwich. Build it as a local date instead.
-      const [year, month, day] = release.released.split('-').map(Number);
-      parts.push(new Date(year, month - 1, day).toLocaleDateString(undefined, {
-        year: 'numeric', month: 'short', day: 'numeric',
-      }));
-    }
+
     meta.textContent = '';
     const summary = document.createElement('div');
     summary.textContent = parts.join(' · ');
     meta.appendChild(summary);
+
+    if (release.released) {
+      if (parts.length) summary.append(' · ');
+      summary.append(await releaseDate(release.released, meta));
+    }
   } catch {
     meta.textContent = 'Build details unavailable — the download link still works.';
   }

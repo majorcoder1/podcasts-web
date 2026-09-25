@@ -1,7 +1,7 @@
 // App-shell cache so the player keeps working offline. Downloaded episode audio
 // lives in its own cache, written by js/downloads.js, and is never purged here.
 
-const SHELL = 'shell-v4';
+const SHELL = 'shell-v5';
 const SHELL_FILES = [
   '/',
   '/index.html',

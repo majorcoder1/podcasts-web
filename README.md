@@ -58,6 +58,13 @@ public `?url=` endpoint would let any visitor probe the machine's own network.
 The front end is the same everywhere; only the proxy differs. Three backends
 ship, in the order you are most likely to want them.
 
+### Change history on the download card
+
+The release date on the download card opens the list in
+`public/download/changelog.json`, newest first. With each update, add an entry
+at the top — `date` (YYYY-MM-DD), `version`, and `changes` in plain words — and
+bump `SHELL` in `public/sw.js` if any JS or CSS changed.
+
 ### Shared hosting — what podcast.4thepeople.live runs on
 
 `public/` is the whole site: static files plus `api.php`, the proxy. No daemon,
