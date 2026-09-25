@@ -2,34 +2,134 @@
   {
     "date": "2026-09-24",
     "version": "1.0.3",
-    "changes": [
-      "Security update for the Android app: closed links other apps could open for no reason, and only trusted apps can now see or control what is playing.",
-      "Updated every part the app is built on, including the audio player, to current versions.",
-      "Fixed a white screen and a lost episode after pausing for a long time.",
-      "Episode artwork is sharp again on the player and the lock screen.",
-      "Long-press the app icon for Resume, New episodes, Queue and Explore.",
-      "Website: stronger protection for the server, and episode downloads no longer strain it.",
-      "Website: easier to find in search, and shared links now show a preview picture.",
-      "Website: works better with a keyboard and screen readers, and respects the reduce-motion setting."
+    "title": "Security update, fixes and shortcuts",
+    "sections": [
+      {
+        "heading": "Android app security",
+        "items": [
+          "Removed three web-link types the app claimed to open but never handled, so other apps can no longer poke at it through them.",
+          "Only the phone itself, your notification and trusted controls such as Bluetooth and Android Auto can now connect to the player. Before, any installed app could see what you were playing.",
+          "The app now states its own connection rules: secure connections only, and only certificates your phone already trusts."
+        ]
+      },
+      {
+        "heading": "Brought up to date",
+        "items": [
+          "Every part the app is built on was nearly two years old and is now current, including the audio player, which reads files from servers all over the internet and so mattered most.",
+          "Built for the newest Android version."
+        ]
+      },
+      {
+        "heading": "Fixes",
+        "items": [
+          "Pausing for half an hour or more no longer leaves a white screen and a lost episode. The app now remembers which episode you were on, not just where you were in it.",
+          "Artwork on the player and lock screen is sharp again. The app now uses the show's full-size cover instead of stretching small episode pictures."
+        ]
+      },
+      {
+        "heading": "New",
+        "items": [
+          "Long-press the app icon for Resume, New episodes, Queue and Explore."
+        ]
+      },
+      {
+        "heading": "Website",
+        "items": [
+          "The server's podcast fetcher now only serves this site, with a fair-use limit per visitor so nobody can use it as a free download service.",
+          "Episode downloads pass through in small pieces instead of loading whole files into memory, so several at once can no longer strain the server.",
+          "Closed a gap that could have let a trick web address reach the server's private network.",
+          "The server's technical details are no longer shown to the public.",
+          "Browsers are told to always use the secure connection, and the camera, microphone and location are switched off for the site.",
+          "Easier to find in search engines, and shared links now show a preview picture.",
+          "Works better with a keyboard and screen readers: a skip-to-content link, a clear focus outline, and a keyboard-friendly sign-in switch.",
+          "Respects your device's reduce-motion setting.",
+          "This update history, opened from the release date."
+        ]
+      }
     ]
   },
   {
     "date": "2026-09-08",
     "version": "1.0.1",
-    "changes": [
-      "Fixed shows that could stop getting new episodes.",
-      "Refresh in a show's menu now always loads the feed fresh.",
-      "The website handles very large feeds, up to 32 MB."
+    "title": "Shows that stopped updating",
+    "sections": [
+      {
+        "heading": "Fixes",
+        "items": [
+          "Fixed shows that could get stuck on an old episode list forever. If the app was interrupted while reading a very large feed, it wrongly believed the feed had not changed. Stuck shows start updating again after this update.",
+          "Refresh in a show's menu now always loads the feed fresh, as a manual way out if a show ever looks stale."
+        ]
+      },
+      {
+        "heading": "Website",
+        "items": [
+          "Handles very large feeds, up to 32 MB. Daily shows with years of back catalogue really do get that big."
+        ]
+      }
     ]
   },
   {
     "date": "2026-09-02",
     "version": "1.0.0",
-    "changes": [
-      "First release of the Android app and the web player.",
-      "Subscribe to any podcast feed, keep a queue, and download episodes for offline listening.",
-      "Playback speed, sleep timer, and import or export of your show list.",
-      "One account keeps your shows and your place in sync between phone and browser."
+    "title": "The website and the first release",
+    "sections": [
+      {
+        "heading": "Web player",
+        "items": [
+          "The same app as on Android, in any browser: Home, Explore and Activity tabs with a mini player docked at the bottom.",
+          "Subscribe, search the podcast directory, keep a queue, and download episodes to listen offline.",
+          "Playback speed, sleep timer, lock-screen and headphone controls, and import or export of your show list.",
+          "Moved to /app, with this page as the front door."
+        ]
+      },
+      {
+        "heading": "Accounts and sync",
+        "items": [
+          "Create an account with an invite code and sign in on your phone and your browser.",
+          "Your shows, your queue and your place in every episode follow you between devices.",
+          "Passwords are stored scrambled, and a device with the wrong clock cannot lose or hide your changes."
+        ]
+      },
+      {
+        "heading": "Download page",
+        "items": [
+          "The signed Android app, version 1.0.0, offered right here with its size and date.",
+          "The phone picture at the top shows the real Home screen, with real shows."
+        ]
+      },
+      {
+        "heading": "Behind the scenes",
+        "items": [
+          "A small server program fetches podcast feeds for the browser, refusing private addresses and checking every redirect.",
+          "Runs on ordinary shared web hosting, with no special server needed.",
+          "New red, white and blue logo on navy."
+        ]
+      }
+    ]
+  },
+  {
+    "date": "2026-09-01",
+    "title": "The Android app is born",
+    "sections": [
+      {
+        "heading": "What it does",
+        "items": [
+          "A new podcast player that rebuilds everything Google Podcasts did, after Google shut it down in 2024.",
+          "Subscribe to any show by searching the directory or pasting a feed address. No account, store or gatekeeper required.",
+          "A queue, downloads for offline listening, and a history of what you played.",
+          "Playback speed, sleep timer and skip silence, with controls on the lock screen and in the notification.",
+          "Checks for new episodes in the background and can download them automatically, cleaning up old ones by your rules.",
+          "Import or export your show list in the standard format other podcast apps use."
+        ]
+      },
+      {
+        "heading": "Polish the same day",
+        "items": [
+          "The app's own waveform icon, including a version for Android's themed icons.",
+          "Fixed screen titles that sat too low under the status bar.",
+          "Fixed a crash when a show appeared twice in search results."
+        ]
+      }
     ]
   }
 ]

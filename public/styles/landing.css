@@ -325,22 +325,56 @@ p.section-sub { margin: 0 0 40px; color: var(--on-surface-muted); max-width: 62c
 .download-card h3 { margin: 0 0 6px; font-size: 22px; font-weight: 500; }
 .download-card p { margin: 0; color: rgb(255 255 255 / 76%); font-size: 15px; }
 .download-meta { margin-top: 10px; font-size: 13px; color: rgb(255 255 255 / 60%); font-variant-numeric: tabular-nums; }
-/* The release date reads as a link and opens the change history below it. */
+/* The release date reads as a link; it drops down the list of updates. */
+.date-menu { position: relative; display: inline-block; }
 .date-toggle {
   font: inherit; color: inherit; background: none; border: 0; padding: 0; margin: 0;
   cursor: pointer; text-decoration: underline; text-underline-offset: 3px;
 }
 .date-toggle:hover { color: #fff; }
-.changelog {
-  margin-top: 14px; padding: 14px 16px; border-radius: 12px;
-  background: rgb(255 255 255 / 8%); color: rgb(255 255 255 / 88%);
-  font-size: 14px; max-height: 320px; overflow-y: auto;
-  scrollbar-color: rgb(255 255 255 / 35%) transparent;
+.update-menu {
+  position: absolute; left: 0; top: calc(100% + 8px); z-index: 20;
+  min-width: 200px; padding: 6px; border-radius: 12px;
+  background: var(--surface); color: var(--on-surface);
+  box-shadow: 0 8px 28px rgb(0 0 0 / 28%);
+  display: grid; gap: 2px;
 }
-.changelog h4 { margin: 14px 0 6px; font-size: 14px; font-weight: 600; color: #fff; }
-.changelog h4:first-child { margin-top: 0; }
-.changelog ul { margin: 0; padding-left: 20px; }
-.changelog li { margin: 4px 0; line-height: 1.45; }
+.update-menu[hidden] { display: none; }
+.update-menu.align-right { left: auto; right: 0; }
+.update-menu button {
+  display: flex; justify-content: space-between; gap: 16px; align-items: center;
+  font: inherit; font-size: 14px; text-align: left; color: inherit;
+  background: none; border: 0; border-radius: 8px; padding: 9px 12px; cursor: pointer;
+  white-space: nowrap;
+}
+.update-menu button:hover, .update-menu button:focus-visible { background: var(--surface-alt); }
+.update-version { font-size: 12px; color: var(--on-surface-muted); }
+
+/* The pop-up with one update's details, in the page's own light or dark theme. */
+.update-dialog {
+  width: min(560px, calc(100vw - 32px)); max-height: min(80vh, 720px);
+  padding: 0; border: 0; border-radius: 20px;
+  background: var(--surface); color: var(--on-surface);
+  box-shadow: 0 24px 60px rgb(0 0 0 / 35%);
+}
+.update-dialog[open] { display: flex; flex-direction: column; }
+.update-dialog::backdrop { background: rgb(7 31 61 / 55%); }
+.update-head {
+  display: flex; justify-content: space-between; align-items: flex-start; gap: 16px;
+  padding: 22px 24px 14px; border-bottom: 1px solid var(--outline);
+}
+.update-date { margin: 0 0 4px; font-size: 13px; color: var(--on-surface-muted); }
+.update-head h2 { margin: 0; font-size: 21px; font-weight: 500; line-height: 1.3; }
+.update-close {
+  flex: none; width: 40px; height: 40px; border-radius: 50%; border: 0; cursor: pointer;
+  background: var(--surface-alt); color: var(--on-surface); display: grid; place-items: center;
+}
+.update-close svg { width: 20px; height: 20px; fill: currentColor; }
+.update-body { padding: 6px 24px 24px; overflow-y: auto; }
+.update-body h3 { margin: 18px 0 6px; font-size: 15px; font-weight: 600; }
+.update-body ul { margin: 0; padding-left: 20px; }
+.update-body li { margin: 6px 0; line-height: 1.5; font-size: 15px; color: var(--on-surface-muted); }
+
 .btn-download { background: #fff; color: var(--navy); height: 52px; padding: 0 28px; font-size: 16px; }
 
 .steps { margin: 36px 0 0; padding: 0; list-style: none; counter-reset: step; display: grid; gap: 16px; }

@@ -164,11 +164,11 @@ function formatDate(iso, month = 'short') {
 }
 
 /**
- * The release date doubles as the way into the change history: clicking it
- * opens the list of every update underneath. With no history file on the
- * server it stays plain text.
+ * The release date doubles as the way into the update history. Clicking it
+ * drops down a short list of update dates; picking one opens a pop-up with
+ * everything that changed that day. With no history file it stays plain text.
  */
-async function releaseDate(iso, container) {
+async function releaseDate(iso) {
   let history = [];
   try {
     const response = await fetch('/download/changelog.json', { cache: 'no-cache' });
@@ -176,55 +176,151 @@ async function releaseDate(iso, container) {
   } catch {
     // No history to show; the date still reads fine on its own.
   }
-  if (!Array.isArray(history) || history.length === 0) {
+  history = Array.isArray(history)
+    ? history.filter((entry) => entry && entry.date && Array.isArray(entry.sections))
+    : [];
+  if (history.length === 0) {
     return formatDate(iso);
   }
+
+  const wrapper = document.createElement('span');
+  wrapper.className = 'date-menu';
 
   const toggle = document.createElement('button');
   toggle.type = 'button';
   toggle.className = 'date-toggle';
   toggle.textContent = formatDate(iso);
+  toggle.setAttribute('aria-label', `${toggle.textContent}, see the update history`);
+  toggle.setAttribute('aria-haspopup', 'menu');
   toggle.setAttribute('aria-expanded', 'false');
-  toggle.setAttribute('aria-controls', 'changelog');
-  toggle.title = 'What changed';
-  toggle.setAttribute('aria-label', `${toggle.textContent}, see what changed`);
+  toggle.setAttribute('aria-controls', 'update-menu');
 
-  const panel = document.createElement('div');
-  panel.id = 'changelog';
-  panel.className = 'changelog';
-  panel.hidden = true;
-  panel.setAttribute('aria-label', 'What changed in each update');
-  panel.setAttribute('role', 'region');
-  panel.tabIndex = 0;   // it can scroll, so keyboard users must be able to reach it
+  const menu = document.createElement('div');
+  menu.id = 'update-menu';
+  menu.className = 'update-menu';
+  menu.setAttribute('role', 'menu');
+  menu.setAttribute('aria-label', 'Updates');
+  menu.hidden = true;
 
-  for (const entry of history) {
-    if (!entry || !entry.date || !Array.isArray(entry.changes)) continue;
-    const heading = document.createElement('h4');
-    heading.textContent = formatDate(entry.date, 'long')
-      + (entry.version ? ` — version ${entry.version}` : '');
+  const dialog = buildUpdateDialog();
+  const items = history.map((entry) => {
+    const item = document.createElement('button');
+    item.type = 'button';
+    item.setAttribute('role', 'menuitem');
+    item.tabIndex = -1;
+    item.textContent = formatDate(entry.date);
+    if (entry.version) {
+      const version = document.createElement('span');
+      version.className = 'update-version';
+      version.textContent = entry.version;
+      item.append(' ', version);
+    }
+    item.addEventListener('click', () => {
+      closeMenu(false);
+      showUpdate(dialog, entry, toggle);
+    });
+    menu.appendChild(item);
+    return item;
+  });
+
+  function openMenu() {
+    menu.hidden = false;
+    menu.classList.remove('align-right');
+    // On a narrow phone the date sits far right; open leftwards instead of off-screen.
+    if (menu.getBoundingClientRect().right > document.documentElement.clientWidth - 16) {
+      menu.classList.add('align-right');
+    }
+    toggle.setAttribute('aria-expanded', 'true');
+    items[0].focus();
+    document.addEventListener('pointerdown', outside, true);
+  }
+  function closeMenu(returnFocus = true) {
+    menu.hidden = true;
+    toggle.setAttribute('aria-expanded', 'false');
+    document.removeEventListener('pointerdown', outside, true);
+    if (returnFocus) toggle.focus();
+  }
+  function outside(event) {
+    if (!wrapper.contains(event.target)) closeMenu(false);
+  }
+
+  toggle.addEventListener('click', () => (menu.hidden ? openMenu() : closeMenu()));
+  toggle.addEventListener('keydown', (event) => {
+    if (event.key === 'ArrowDown' && menu.hidden) {
+      event.preventDefault();
+      openMenu();
+    }
+  });
+  menu.addEventListener('keydown', (event) => {
+    const index = items.indexOf(document.activeElement);
+    let next = null;
+    if (event.key === 'ArrowDown') next = items[(index + 1) % items.length];
+    else if (event.key === 'ArrowUp') next = items[(index - 1 + items.length) % items.length];
+    else if (event.key === 'Home') next = items[0];
+    else if (event.key === 'End') next = items[items.length - 1];
+    else if (event.key === 'Escape' || event.key === 'Tab') {
+      if (event.key === 'Escape') event.preventDefault();
+      closeMenu(event.key === 'Escape');
+      return;
+    }
+    if (next) {
+      event.preventDefault();
+      next.focus();
+    }
+  });
+
+  wrapper.append(toggle, menu);
+  return wrapper;
+}
+
+/** One pop-up, reused for whichever update is picked. */
+function buildUpdateDialog() {
+  const dialog = document.createElement('dialog');
+  dialog.className = 'update-dialog';
+  dialog.setAttribute('aria-labelledby', 'update-title');
+  dialog.innerHTML = `
+    <div class="update-head">
+      <div>
+        <p class="update-date" id="update-date"></p>
+        <h2 id="update-title"></h2>
+      </div>
+      <button type="button" class="update-close" aria-label="Close">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"/></svg>
+      </button>
+    </div>
+    <div class="update-body" id="update-body"></div>`;
+  dialog.querySelector('.update-close').addEventListener('click', () => dialog.close());
+  // A click on the dimmed backdrop lands on the dialog element itself.
+  dialog.addEventListener('click', (event) => {
+    if (event.target === dialog) dialog.close();
+  });
+  document.body.appendChild(dialog);
+  return dialog;
+}
+
+function showUpdate(dialog, entry, returnTo) {
+  dialog.querySelector('#update-date').textContent = formatDate(entry.date, 'long')
+    + (entry.version ? ` · Version ${entry.version}` : '');
+  dialog.querySelector('#update-title').textContent = entry.title || 'What changed';
+
+  const body = dialog.querySelector('#update-body');
+  body.textContent = '';
+  for (const section of entry.sections) {
+    if (!section || !Array.isArray(section.items)) continue;
+    const heading = document.createElement('h3');
+    heading.textContent = section.heading || '';
     const list = document.createElement('ul');
-    for (const change of entry.changes) {
+    for (const text of section.items) {
       const item = document.createElement('li');
-      item.textContent = String(change);
+      item.textContent = String(text);
       list.appendChild(item);
     }
-    panel.append(heading, list);
+    body.append(heading, list);
   }
-  container.appendChild(panel);
 
-  toggle.addEventListener('click', () => {
-    const open = panel.hidden;
-    panel.hidden = !open;
-    toggle.setAttribute('aria-expanded', String(open));
-  });
-  panel.addEventListener('keydown', (event) => {
-    if (event.key === 'Escape') {
-      panel.hidden = true;
-      toggle.setAttribute('aria-expanded', 'false');
-      toggle.focus();
-    }
-  });
-  return toggle;
+  dialog.addEventListener('close', () => returnTo.focus(), { once: true });
+  dialog.showModal();
+  body.scrollTop = 0;
 }
 
 async function loadRelease() {
@@ -248,7 +344,7 @@ async function loadRelease() {
 
     if (release.released) {
       if (parts.length) summary.append(' · ');
-      summary.append(await releaseDate(release.released, meta));
+      summary.append(await releaseDate(release.released));
     }
   } catch {
     meta.textContent = 'Build details unavailable — the download link still works.';
