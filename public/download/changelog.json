@@ -43,6 +43,8 @@
           "Easier to find in search engines, and shared links now show a preview picture.",
           "Works better with a keyboard and screen readers: a skip-to-content link, a clear focus outline, and a keyboard-friendly sign-in switch.",
           "Respects your device's reduce-motion setting.",
+          "Podcast artwork and episode playback work again in the web player. A security setting inherited from the main site was blocking them.",
+          "Search and the top charts ask the podcast directory directly, since it was refusing requests from the server.",
           "This update history, opened from the release date."
         ]
       }

@@ -1,5 +1,6 @@
-// Everything network-facing goes through the same-origin proxy in server.py.
-// Feeds do not send CORS headers, so the browser cannot fetch them directly.
+// Feeds and audio go through the same-origin proxy (api.php or server.py):
+// they send no CORS headers, so the browser cannot fetch them directly.
+// Apple's directory does, so search and charts go straight to it.
 
 async function getJson(path) {
   const response = await fetch(path, { headers: { Accept: 'application/json' } });
@@ -48,9 +49,28 @@ function dedupe(results) {
   });
 }
 
+/**
+ * Apple's directory answers browsers directly (it sends CORS headers), and it
+ * refuses many hosting companies' servers, so ask it from here first and use
+ * our own proxy only if the direct call fails.
+ */
+async function directory(directUrl, proxyPath) {
+  try {
+    const response = await fetch(directUrl, { headers: { Accept: 'application/json' } });
+    if (response.ok) return await response.json();
+  } catch {
+    // Blocked or offline; the proxy gets a turn.
+  }
+  return getJson(proxyPath);
+}
+
 export async function search(term, limit = 50) {
   if (!term.trim()) return [];
-  const payload = await getJson(`/api/search?q=${encodeURIComponent(term)}&limit=${limit}`);
+  const query = new URLSearchParams({ term, media: 'podcast', entity: 'podcast', limit: String(limit) });
+  const payload = await directory(
+    `https://itunes.apple.com/search?${query}`,
+    `/api/search?q=${encodeURIComponent(term)}&limit=${limit}`,
+  );
   return dedupe((payload.results || []).map(toResult));
 }
 
@@ -60,7 +80,9 @@ export async function search(term, limit = 50) {
  */
 export async function topShows(genreId, limit = 24) {
   const query = genreId ? `?genre=${genreId}&limit=${limit}` : `?limit=${limit}`;
-  const payload = await getJson(`/api/charts${query}`);
+  const direct = `https://itunes.apple.com/us/rss/toppodcasts/limit=${limit}`
+    + (genreId ? `/genre=${genreId}` : '') + '/json';
+  const payload = await directory(direct, `/api/charts${query}`);
   const names = (payload.feed?.entry || [])
     .map((entry) => entry['im:name']?.label)
     .filter(Boolean);

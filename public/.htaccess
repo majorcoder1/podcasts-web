@@ -75,9 +75,12 @@
 </IfModule>
 
 # Artwork and audio come straight from publishers; everything else is ours.
+# "always" matters: the main site's .htaccess one folder up sends a stricter
+# policy that blocks publisher artwork and audio, and browsers obey every policy
+# they receive. Setting ours in the same "always" table replaces that one.
 <IfModule mod_headers.c>
     <FilesMatch "\.html$">
-        Header set Content-Security-Policy "default-src 'self'; img-src 'self' https: data:; media-src 'self' https: blob:; connect-src 'self' https:; script-src 'self'; style-src 'self'; base-uri 'none'; frame-ancestors 'self'"
+        Header always set Content-Security-Policy "default-src 'self'; img-src 'self' https: data:; media-src 'self' https: blob:; connect-src 'self' https:; script-src 'self'; style-src 'self'; base-uri 'none'; frame-ancestors 'self'"
     </FilesMatch>
 </IfModule>
 
