@@ -178,13 +178,6 @@ async function loadRelease() {
     summary.textContent = parts.join(' · ');
     meta.appendChild(summary);
 
-    if (release.sha256) {
-      const line = document.createElement('div');
-      // Any fainter and this fails contrast on the navy card.
-      line.style.cssText = 'margin-top:6px;word-break:break-all;font-size:11px;color:rgb(255 255 255 / 80%)';
-      line.textContent = `SHA-256 ${release.sha256}`;
-      meta.appendChild(line);
-    }
   } catch {
     meta.textContent = 'Build details unavailable — the download link still works.';
   }
