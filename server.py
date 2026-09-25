@@ -262,9 +262,6 @@ class Handler(BaseHTTPRequestHandler):
     def api_health(self):
         self.send_json({
             "ok": True,
-            "backend": "python",
-            "python": sys.version.split()[0],
-            "data_dir": app_api._db_path is not None,
             "registration": app_api.REGISTRATION,
         })
 

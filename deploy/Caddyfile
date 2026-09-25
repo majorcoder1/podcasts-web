@@ -15,6 +15,7 @@ podcast.4thepeople.live {
 		Strict-Transport-Security "max-age=31536000; includeSubDomains"
 		X-Content-Type-Options "nosniff"
 		Referrer-Policy "no-referrer"
+		Permissions-Policy "camera=(), microphone=(), geolocation=(), payment=(), usb=(), serial=(), bluetooth=(), midi=(), display-capture=(), browsing-topics=()"
 		# The app is entirely self-hosted except for podcast artwork and audio,
 		# which come straight from publishers.
 		Content-Security-Policy "default-src 'self'; img-src 'self' https: data:; media-src 'self' https: blob:; connect-src 'self' https:; script-src 'self'; style-src 'self'; base-uri 'none'; frame-ancestors 'none'"

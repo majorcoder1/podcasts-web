@@ -38,16 +38,23 @@ function require_json_post(): array
 
 switch ($route) {
     case 'health':
+        // The public answer is only what the sign-in page needs. The full
+        // host report (PHP version, limits, paths) waits for ?key= set to the
+        // invite code in the data folder, so strangers cannot read it.
+        $public = array('ok' => true, 'registration' => REGISTRATION);
+        $key = isset($_GET['key']) ? (string) $_GET['key'] : '';
+        $code = $key !== '' ? invite_code() : '';
+        if ($code === '' || !hash_equals($code, $key)) {
+            json_out($public);
+        }
         $dir = data_dir();
-        json_out(array(
-            'ok'              => true,
+        json_out($public + array(
             'php'             => PHP_VERSION,
             'curl'            => function_exists('curl_init'),
             'allow_url_fopen' => (bool) ini_get('allow_url_fopen'),
             'pdo_drivers'     => PDO::getAvailableDrivers(),
             'data_dir'        => $dir !== null,
             'data_dir_public' => data_dir_is_public(),
-            'registration'    => REGISTRATION,
             'memory_limit'    => ini_get('memory_limit'),
             'max_execution'   => ini_get('max_execution_time'),
             'post_max_size'   => ini_get('post_max_size'),

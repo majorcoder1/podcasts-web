@@ -63,6 +63,15 @@
     Header always set X-Content-Type-Options "nosniff"
     Header always set Referrer-Policy "no-referrer"
     Header always set X-Frame-Options "SAMEORIGIN"
+
+    # Browsers only honour this over HTTPS, and the host already forces HTTPS,
+    # so it is safe to send on every response. Once a browser has seen it, it
+    # will not try plain HTTP for this site for a year.
+    Header always set Strict-Transport-Security "max-age=31536000"
+
+    # A podcast player needs none of these; switch them off so nothing loaded
+    # into the page can ask for them either.
+    Header always set Permissions-Policy "camera=(), microphone=(), geolocation=(), payment=(), usb=(), serial=(), bluetooth=(), midi=(), display-capture=(), browsing-topics=()"
 </IfModule>
 
 # Artwork and audio come straight from publishers; everything else is ours.

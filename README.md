@@ -47,7 +47,7 @@ through a small same-origin proxy:
 | `/api/search?q=` | Directory search |
 | `/api/charts?genre=` | Category charts |
 | `/api/audio?url=` | Only for downloads — streaming plays straight from the publisher |
-| `/api/health` | Reports what the host supports; check it first after uploading |
+| `/api/health?key=` | Reports what the host supports; check it first after uploading |
 
 The proxy refuses non-http(s) schemes and any host that resolves to private,
 loopback or link-local space, re-checking on every redirect hop. Without that, a
@@ -77,10 +77,12 @@ at the folder's top level, not inside a nested `public/`.
 **Check the host before anything else:**
 
 ```bash
-curl -s https://podcast.4thepeople.live/api/health
+curl -s "https://podcast.4thepeople.live/api/health?key=INVITE_CODE"
 ```
 
-That reports the PHP version, whether cURL is available, and whether the feed
+Replace `INVITE_CODE` with the contents of `invite-code.txt` in the data folder
+(`podcast-data/` beside the web root, or `data/`). Without the key, health
+answers only `ok` and the registration mode. With it, it reports the PHP version, whether cURL is available, and whether the feed
 cache directory is writable. `"curl": true` is the one that matters; the code
 falls back to streams, but only if `allow_url_fopen` is on.
 
