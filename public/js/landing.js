@@ -177,7 +177,6 @@ async function loadRelease() {
     const summary = document.createElement('div');
     summary.textContent = parts.join(' · ');
     meta.appendChild(summary);
-
   } catch {
     meta.textContent = 'Build details unavailable — the download link still works.';
   }
