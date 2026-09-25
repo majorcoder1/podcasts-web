@@ -479,3 +479,11 @@ dialog .close { display: block; margin-left: auto; margin-top: 8px; padding: 8px
   .show-header .art, .show-header .art-fallback { width: 180px; height: 180px; }
   .episode-description { font-size: 14px; }
 }
+
+/* Honour the system "reduce motion" setting: no slides, no spinning. */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important; animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important; scroll-behavior: auto !important;
+  }
+}

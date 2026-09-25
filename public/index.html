@@ -6,16 +6,53 @@
     <title>Podcasts — 4 The People Media</title>
     <meta name="description" content="A podcast player that keeps your subscriptions, queue and place in every episode in sync between your phone and your browser. Any RSS feed, no tracking, yours." />
     <meta name="theme-color" content="#0a3161" />
+    <link rel="canonical" href="https://podcast.4thepeople.live/" />
+    <meta name="robots" content="index, follow" />
     <link rel="icon" href="/icon.svg" type="image/svg+xml" />
-    <link rel="apple-touch-icon" href="/icon.svg" />
+    <link rel="icon" href="/img/icon-192.png" type="image/png" sizes="192x192" />
+    <link rel="apple-touch-icon" href="/img/apple-touch-icon.png" />
     <link rel="stylesheet" href="/styles/landing.css" />
 
     <meta property="og:title" content="Podcasts — 4 The People Media" />
     <meta property="og:description" content="Your subscriptions, queue and place in every episode, in sync between phone and browser." />
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://podcast.4thepeople.live/" />
+    <meta property="og:site_name" content="4 The People Media" />
+    <meta property="og:image" content="https://podcast.4thepeople.live/img/share.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="Podcasts: your subscriptions and place in every episode, in sync between phone and browser." />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Podcasts — 4 The People Media" />
+    <meta name="twitter:description" content="Your subscriptions, queue and place in every episode, in sync between phone and browser." />
+    <meta name="twitter:image" content="https://podcast.4thepeople.live/img/share.png" />
+
+    <!-- Read by search engines only; a data block, so the CSP does not apply. -->
+    <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "Podcasts",
+  "operatingSystem": "Android 7.0 or later; any modern web browser",
+  "applicationCategory": "MultimediaApplication",
+  "description": "A podcast player that keeps your subscriptions, queue and place in every episode in sync between your phone and your browser. Any RSS feed, no tracking.",
+  "url": "https://podcast.4thepeople.live/",
+  "downloadUrl": "https://podcast.4thepeople.live/#download",
+  "image": "https://podcast.4thepeople.live/img/share.png",
+  "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "USD"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "4 The People Media"
+  }
+}
+    </script>
   </head>
   <body>
+    <a class="skip-link" href="#main">Skip to main content</a>
     <header class="site-header">
       <div class="wrap">
         <span class="brand"><img src="/icon.svg" alt="" /> Podcasts</span>
@@ -26,7 +63,7 @@
       </div>
     </header>
 
-    <main>
+    <main id="main" tabindex="-1">
       <section class="hero">
         <div class="wrap hero-grid">
           <div>
@@ -225,13 +262,14 @@
           </div>
 
           <div class="card" id="account-card">
-            <div class="tabs-row" role="tablist">
-              <button role="tab" id="tab-signin" aria-selected="true">Sign in</button>
-              <button role="tab" id="tab-register" aria-selected="false">Create account</button>
+            <div class="tabs-row" role="tablist" aria-label="Account">
+              <button type="button" role="tab" id="tab-signin" aria-selected="true" aria-controls="auth-panel" tabindex="0">Sign in</button>
+              <button type="button" role="tab" id="tab-register" aria-selected="false" aria-controls="auth-panel" tabindex="-1">Create account</button>
             </div>
 
             <p class="form-message" id="form-message" role="status"></p>
 
+            <div id="auth-panel" role="tabpanel" aria-labelledby="tab-signin">
             <form id="auth-form" autocomplete="on">
               <div class="field">
                 <label for="username">Username</label>
@@ -242,20 +280,21 @@
               <div class="field">
                 <label for="password">Password</label>
                 <input id="password" name="password" type="password"
-                       autocomplete="current-password" required />
+                       autocomplete="current-password" aria-describedby="password-hint" required />
                 <div class="hint" id="password-hint" hidden>At least 8 characters.</div>
               </div>
 
               <div class="field" id="invite-field" hidden>
                 <label for="invite">Invite code</label>
-                <input id="invite" name="invite" type="text" autocapitalize="none" spellcheck="false" />
-                <div class="hint">Ask Aaron for the code if you don't have one.</div>
+                <input id="invite" name="invite" type="text" autocapitalize="none" spellcheck="false" aria-describedby="invite-hint" />
+                <div class="hint" id="invite-hint">Ask Aaron for the code if you don't have one.</div>
               </div>
 
               <button class="btn btn-primary" type="submit" id="submit" style="width: 100%">
                 Sign in
               </button>
             </form>
+            </div>
           </div>
         </div>
       </section>

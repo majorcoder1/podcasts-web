@@ -1,0 +1,6 @@
+# Everything public may be indexed. The API only answers the app itself.
+User-agent: *
+Allow: /
+Disallow: /api/
+
+Sitemap: https://podcast.4thepeople.live/sitemap.xml

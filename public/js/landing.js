@@ -3,6 +3,7 @@
 import * as account from './account.js';
 
 const form = document.getElementById('auth-form');
+const authPanel = document.getElementById('auth-panel');
 const message = document.getElementById('form-message');
 const submit = document.getElementById('submit');
 const tabSignIn = document.getElementById('tab-signin');
@@ -27,6 +28,10 @@ function setMode(next) {
 
   tabSignIn.setAttribute('aria-selected', String(!registering));
   tabRegister.setAttribute('aria-selected', String(registering));
+  // Only the selected tab sits in the Tab order; arrows move between them.
+  tabSignIn.tabIndex = registering ? -1 : 0;
+  tabRegister.tabIndex = registering ? 0 : -1;
+  authPanel.setAttribute('aria-labelledby', registering ? 'tab-register' : 'tab-signin');
   submit.textContent = registering ? 'Create account' : 'Sign in';
   passwordInput.autocomplete = registering ? 'new-password' : 'current-password';
   passwordHint.hidden = !registering;
@@ -114,6 +119,25 @@ form.addEventListener('submit', async (event) => {
 tabSignIn.addEventListener('click', () => setMode('signin'));
 tabRegister.addEventListener('click', () => setMode('register'));
 
+// Keyboard pattern for tabs: Left/Right (and Home/End) switch and move focus.
+for (const tab of [tabSignIn, tabRegister]) {
+  tab.addEventListener('keydown', (event) => {
+    if (tabRegister.hidden) return;
+    let target = null;
+    if (event.key === 'ArrowLeft' || event.key === 'ArrowRight') {
+      target = tab === tabSignIn ? tabRegister : tabSignIn;
+    } else if (event.key === 'Home') {
+      target = tabSignIn;
+    } else if (event.key === 'End') {
+      target = tabRegister;
+    }
+    if (!target) return;
+    event.preventDefault();
+    setMode(target === tabRegister ? 'register' : 'signin');
+    target.focus();
+  });
+}
+
 // ---- APK details ------------------------------------------------------------
 
 const BYTES = ['bytes', 'KB', 'MB', 'GB'];
@@ -156,7 +180,8 @@ async function loadRelease() {
 
     if (release.sha256) {
       const line = document.createElement('div');
-      line.style.cssText = 'margin-top:6px;word-break:break-all;font-size:11px;opacity:.75';
+      // Any fainter and this fails contrast on the navy card.
+      line.style.cssText = 'margin-top:6px;word-break:break-all;font-size:11px;color:rgb(255 255 255 / 80%)';
       line.textContent = `SHA-256 ${release.sha256}`;
       meta.appendChild(line);
     }
