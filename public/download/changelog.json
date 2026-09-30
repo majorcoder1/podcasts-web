@@ -5,6 +5,13 @@
     "title": "Episode menu, and player bar artwork fix",
     "sections": [
       {
+        "heading": "Updates now actually arrive",
+        "items": [
+          "The site was storing a copy of itself on your device and serving that copy first, so once you had opened it, later updates never appeared - the new episode menu was on the server but your browser kept showing the old version.",
+          "It now checks the server for the app itself and only falls back to the stored copy when you are offline. Pictures and icons are still served from the device, since they are large and rarely change."
+        ]
+      },
+      {
         "heading": "Sign in",
         "items": [
           "The first account on the server no longer needs an invite code. There was no way to get one without digging a file out of the server, which meant nobody could sign in at all.",

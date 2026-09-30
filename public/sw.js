@@ -1,7 +1,7 @@
 // App-shell cache so the player keeps working offline. Downloaded episode audio
 // lives in its own cache, written by js/downloads.js, and is never purged here.
 
-const SHELL = 'shell-v7';
+const SHELL = 'shell-v8';
 const SHELL_FILES = [
   '/',
   '/index.html',
@@ -25,6 +25,7 @@ const SHELL_FILES = [
   '/js/dom.js',
   '/js/icons.js',
   '/js/components.js',
+  '/js/menu.js',
   '/js/views/home.js',
   '/js/views/explore.js',
   '/js/views/activity.js',
@@ -74,6 +75,32 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
+  // Code and styles go to the network first.
+  //
+  // This used to be cache-first for everything, which meant a returning visitor
+  // kept running whatever JavaScript their browser had saved - a deploy was
+  // invisible until SHELL was renamed, and forgetting to rename it shipped an
+  // update nobody could see. Assets are served no-cache with ETags, so the
+  // usual answer here is a cheap 304.
+  const codeLike = /\.(js|css|html|json|webmanifest)$/.test(url.pathname);
+
+  if (codeLike) {
+    event.respondWith(
+      fetch(request)
+        .then((response) => {
+          if (response.ok) {
+            const copy = response.clone();
+            caches.open(SHELL).then((cache) => cache.put(request, copy));
+          }
+          return response;
+        })
+        // Offline: whatever was last seen is better than nothing.
+        .catch(() => caches.match(request)),
+    );
+    return;
+  }
+
+  // Artwork and icons change rarely and are heavy, so those stay cache-first.
   event.respondWith(
     caches.match(request).then(
       (hit) =>
