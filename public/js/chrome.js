@@ -6,6 +6,7 @@ import * as store from './store.js';
 import { art, escapeHtml, onAction } from './dom.js';
 import { icon } from './icons.js';
 import { formatClock, formatRemaining, formatSpeed } from './format.js';
+import { showRoute } from './routes.js';
 
 const TABS = [
   { route: '/', label: 'Home', icon: 'home' },
@@ -48,7 +49,7 @@ export function init(context) {
     sleep: () => openSleepDialog(),
     goToShow: ({ feed }) => {
       closeSheet();
-      ctx.navigate(`/show/${encodeURIComponent(feed)}`);
+      ctx.navigate(showRoute(feed));
     },
   });
 

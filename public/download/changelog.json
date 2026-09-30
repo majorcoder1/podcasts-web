@@ -1,6 +1,22 @@
 [
   {
     "date": "2026-09-30",
+    "version": "1.0.6",
+    "title": "Show links survive a refresh",
+    "sections": [
+      {
+        "heading": "Fixes",
+        "items": [
+          "Opening a show page directly - refreshing it, opening a bookmark, or following a link somebody sent you - gave a \"403 Forbidden\" page instead of the show. Tapping through to a show from inside the app always worked, which is why this went unnoticed for so long.",
+          "A show's address used to carry the podcast feed's own web address inside it, slashes and all. The web host's firewall rejects any address built that way before the site ever sees the request, so nothing on the site could catch it or explain it. Show addresses are now written in a form with no slashes in them, and there is nothing left to block.",
+          "Signing in from a show link works again too. It used to hand you back to the same blocked address afterwards.",
+          "Show links you bookmarked before this update will still fail, because the host stops them before the site can redirect you. Open the show once from inside the app and bookmark it again."
+        ]
+      }
+    ]
+  },
+  {
+    "date": "2026-09-30",
     "version": "1.0.5",
     "title": "The show page gets a menu too",
     "sections": [

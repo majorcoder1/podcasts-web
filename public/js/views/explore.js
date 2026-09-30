@@ -2,6 +2,7 @@ import * as api from '../api.js';
 import { showTile, spinner, topBar, iconButton } from '../components.js';
 import { escapeHtml } from '../dom.js';
 import { icon } from '../icons.js';
+import { showRoute } from '../routes.js';
 
 const state = { query: '', categoryIndex: 0, results: [], loading: false, error: null };
 let debounce = null;
@@ -98,7 +99,7 @@ function wire(root, ctx) {
       loadCategory(root, ctx);
       paint(root, ctx);
     },
-    show: ({ feed }) => ctx.navigate(`/show/${encodeURIComponent(feed)}`),
+    show: ({ feed }) => ctx.navigate(showRoute(feed)),
     settings: () => ctx.navigate('/settings'),
   });
 }

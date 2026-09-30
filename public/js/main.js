@@ -6,6 +6,7 @@ import * as downloads from './downloads.js';
 import * as chrome from './chrome.js';
 import * as account from './account.js';
 import { onAction, toast } from './dom.js';
+import { decodeFeed, showRoute } from './routes.js';
 import { openSheet } from './menu.js';
 
 import * as home from './views/home.js';
@@ -62,7 +63,7 @@ async function render() {
 
   if (route.startsWith('/show/')) {
     chrome.setActiveTab(null);
-    const feedUrl = decodeURIComponent(route.slice('/show/'.length));
+    const feedUrl = decodeFeed(route.slice('/show/'.length));
     return show.render(screen, ctx, feedUrl);
   }
 
@@ -93,8 +94,8 @@ async function render() {
  */
 function bindEpisodeActions(root, extra = {}) {
   onAction(root, {
-    open: ({ feed }) => navigate(`/show/${encodeURIComponent(feed)}`),
-    show: ({ feed }) => navigate(`/show/${encodeURIComponent(feed)}`),
+    open: ({ feed }) => navigate(showRoute(feed)),
+    show: ({ feed }) => navigate(showRoute(feed)),
     toggle: ({ guid }) => toggleEpisode(guid),
     enqueue: async ({ guid }) => {
       await store.addToQueue(guid);
@@ -183,7 +184,7 @@ async function openEpisodeMenu(guid) {
     {
       icon: 'podcast',
       label: 'Go to show',
-      action: () => navigate(`/show/${encodeURIComponent(episode.feedUrl)}`),
+      action: () => navigate(showRoute(episode.feedUrl)),
     },
     {
       icon: 'delete',
