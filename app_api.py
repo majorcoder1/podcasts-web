@@ -191,6 +191,14 @@ def invite_code() -> str:
 # ---- tokens -----------------------------------------------------------------
 
 
+def is_first_run() -> bool:
+    """True while the server has no accounts at all."""
+    try:
+        return db().execute("SELECT COUNT(*) FROM users").fetchone()[0] == 0
+    except sqlite3.Error:
+        return False
+
+
 def issue_token(user_id: int, device: str) -> str:
     token = secrets.token_hex(32)
     connection = db()
@@ -248,7 +256,9 @@ def register(payload: dict, device: str) -> tuple[dict, str]:
         )
     if len(password) < 8:
         raise ApiError(400, "Password must be at least 8 characters")
-    if REGISTRATION == "invite":
+    # The first account needs no code - there is nobody to ask yet. Mirrors
+    # handle_register() in the PHP backend.
+    if REGISTRATION == "invite" and not is_first_run():
         expected = invite_code()
         if not expected or not hmac.compare_digest(
             expected, str(payload.get("inviteCode", ""))

@@ -263,6 +263,7 @@ class Handler(BaseHTTPRequestHandler):
         self.send_json({
             "ok": True,
             "registration": app_api.REGISTRATION,
+            "firstRun": app_api.REGISTRATION != "closed" and app_api.is_first_run(),
         })
 
     def api_account(self, route, query):

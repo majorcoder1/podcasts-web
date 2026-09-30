@@ -41,7 +41,13 @@ switch ($route) {
         // The public answer is only what the sign-in page needs. The full
         // host report (PHP version, limits, paths) waits for ?key= set to the
         // invite code in the data folder, so strangers cannot read it.
-        $public = array('ok' => true, 'registration' => REGISTRATION);
+        // firstRun lets the sign-up form stop asking for a code that cannot
+        // exist yet. It stops being true the moment an account is created.
+        $public = array(
+            'ok'           => true,
+            'registration' => REGISTRATION,
+            'firstRun'     => REGISTRATION !== 'closed' && is_first_run(),
+        );
         $key = isset($_GET['key']) ? (string) $_GET['key'] : '';
         $code = $key !== '' ? invite_code() : '';
         if ($code === '' || !hash_equals($code, $key)) {

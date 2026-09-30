@@ -5,6 +5,13 @@
     "title": "Episode menu, and player bar artwork fix",
     "sections": [
       {
+        "heading": "Sign in",
+        "items": [
+          "The first account on the server no longer needs an invite code. There was no way to get one without digging a file out of the server, which meant nobody could sign in at all.",
+          "Once that first account exists, an invite code is required again, so this cannot be used by anyone else later."
+        ]
+      },
+      {
         "heading": "New",
         "items": [
           "The three dots on an episode now open a menu, which is what they always looked like they should do. Play next, add to or remove from the queue, download, mark as played or unplayed, go to the show, or hide the episode.",

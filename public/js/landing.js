@@ -39,6 +39,10 @@ function setMode(next) {
 
   // The invite field only appears when the server actually wants one.
   inviteField.hidden = !(registering && serverWantsInvite);
+
+  if (registering && firstRun) {
+    say('This server has no accounts yet, so no invite code is needed. The next one will.', 'ok');
+  }
 }
 
 function say(text, kind = 'error') {
@@ -47,12 +51,15 @@ function say(text, kind = 'error') {
 }
 
 let serverWantsInvite = true;
+let firstRun = false;
 
 async function loadServerConfig() {
   try {
     const response = await fetch('/api/health');
     const health = await response.json();
-    serverWantsInvite = health.registration === 'invite';
+    // No accounts yet means no code exists to ask for.
+    serverWantsInvite = health.registration === 'invite' && !health.firstRun;
+    firstRun = Boolean(health.firstRun);
     if (health.registration === 'closed') {
       tabRegister.hidden = true;
     }

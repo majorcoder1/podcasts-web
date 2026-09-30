@@ -9,3 +9,4 @@ public/data/*
 !public/data/.htaccess
 public/download/*.apk
 public/download/release.json
+public/deploy-key.php

@@ -30,6 +30,16 @@ function invite_code(): string
     return $code === false ? '' : trim($code);
 }
 
+/** True while the server has no accounts at all. */
+function is_first_run(): bool
+{
+    try {
+        return ((int) db()->query('SELECT COUNT(*) FROM users')->fetchColumn()) === 0;
+    } catch (PDOException $error) {
+        return false;
+    }
+}
+
 function issue_token(int $userId, string $device): string
 {
     $token = bin2hex(random_bytes(32));
@@ -153,7 +163,10 @@ function handle_register(array $input): void
     if (strlen($password) < 8) {
         fail(400, 'Password must be at least 8 characters');
     }
-    if (REGISTRATION === 'invite') {
+    // The very first account needs no code. On a fresh server there is nobody
+    // to ask for one, and the code lives in a file above the web root that the
+    // owner has to go and find. Once one account exists this closes for good.
+    if (REGISTRATION === 'invite' && !is_first_run()) {
         $supplied = field($input, 'inviteCode');
         $expected = invite_code();
         if ($expected === '' || !hash_equals($expected, $supplied)) {
