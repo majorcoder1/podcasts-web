@@ -2,6 +2,7 @@ import * as store from '../store.js';
 import * as player from '../player.js';
 import { episodeRow, spinner, topBar, iconButton } from '../components.js';
 import { art, escapeHtml, toast } from '../dom.js';
+import { openSheet } from '../menu.js';
 import { icon } from '../icons.js';
 
 let newestFirst = true;
@@ -93,11 +94,81 @@ async function paint(root, ctx, feedUrl) {
       toast('Unsubscribed');
       paint(root, ctx, feedUrl);
     },
+    // A three-dot icon promises a menu, so it opens one. It used to silently
+    // toggle auto download, which looked like a dead button.
     showMenu: async () => {
       const current = await store.getPodcast(feedUrl);
-      const next = !current.autoDownload;
-      await store.setPodcastFlag(feedUrl, 'autoDownload', next);
-      toast(next ? 'Auto download on for this show' : 'Auto download off');
+      if (!current) return;
+
+      const items = [
+        {
+          icon: 'downloading',
+          label: 'Check for new episodes',
+          action: async () => {
+            toast('Checking\u2026');
+            try {
+              await store.refresh(feedUrl);
+              toast('Up to date');
+            } catch {
+              toast("Couldn't reach this feed");
+            }
+            paint(root, ctx, feedUrl);
+          },
+        },
+        {
+          icon: current.autoDownload ? 'downloadDone' : 'download',
+          label: current.autoDownload ? 'Turn off auto download' : 'Auto download new episodes',
+          action: async () => {
+            await store.setPodcastFlag(feedUrl, 'autoDownload', !current.autoDownload);
+            toast(current.autoDownload ? 'Auto download off' : 'Auto download on');
+            paint(root, ctx, feedUrl);
+          },
+        },
+        {
+          icon: 'sort',
+          label: newestFirst ? 'Show oldest first' : 'Show newest first',
+          action: () => {
+            newestFirst = !newestFirst;
+            paint(root, ctx, feedUrl);
+          },
+        },
+        {
+          icon: 'checkCircle',
+          label: 'Mark all as played',
+          action: async () => {
+            const all = await store.episodesFor(feedUrl);
+            const unplayed = all.filter((episode) => !episode.isCompleted);
+            for (const episode of unplayed) {
+              await store.markCompleted(episode.guid, true);
+            }
+            toast(`Marked ${unplayed.length} as played`);
+            paint(root, ctx, feedUrl);
+          },
+        },
+      ];
+
+      if (current.link) {
+        items.push({
+          icon: 'rss',
+          label: "Open the show's website",
+          action: () => window.open(current.link, '_blank', 'noopener'),
+        });
+      }
+
+      if (current.isSubscribed) {
+        items.push({
+          icon: 'remove',
+          label: 'Unsubscribe',
+          danger: true,
+          action: async () => {
+            await store.unsubscribe(feedUrl);
+            toast('Unsubscribed');
+            paint(root, ctx, feedUrl);
+          },
+        });
+      }
+
+      openSheet({ title: current.title, subtitle: current.author, items });
     },
     // Tapping a row on the show page plays it, as in the original.
     open: ({ guid }) => ctx.toggleEpisode(guid),

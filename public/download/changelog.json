@@ -1,5 +1,19 @@
 [
   {
+    "date": "2026-09-30",
+    "version": "1.0.5",
+    "title": "The show page gets a menu too",
+    "sections": [
+      {
+        "heading": "Fixes",
+        "items": [
+          "The three dots at the top of a show page now open a menu: check for new episodes, auto download, change the sort order, mark everything as played, open the show's website, or unsubscribe. Before, tapping it silently switched auto download on or off, which looked like nothing had happened.",
+          "Fixed a fault where choosing something from a menu could do nothing at all. The action was scheduled in a way that only runs while the screen is being redrawn, so on a background tab it was dropped."
+        ]
+      }
+    ]
+  },
+  {
     "date": "2026-09-29",
     "version": "1.0.4",
     "title": "Episode menu, and player bar artwork fix",

@@ -54,9 +54,17 @@ export function openSheet({ title, subtitle, items }) {
     const chosen = items[Number(button.dataset.index)];
     sheet.close();
     // Let the sheet finish closing before the action re-renders underneath it.
-    requestAnimationFrame(() => chosen.action());
+    // Deliberately a timeout rather than requestAnimationFrame: rAF only runs
+    // while the page is painting, so in a background or throttled tab the menu
+    // would close and the action would silently never happen.
+    setTimeout(() => chosen.action(), 0);
   });
 
   sheet.addEventListener('close', () => sheet.remove());
+  // close() on an already-closed dialog fires nothing, so clear any stragglers
+  // rather than trusting every sheet to remove itself.
+  document.querySelectorAll('dialog.sheet').forEach((other) => {
+    if (other !== sheet && !other.open) other.remove();
+  });
   return sheet;
 }
