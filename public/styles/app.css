@@ -461,6 +461,56 @@ hr { border: 0; border-top: 1px solid var(--outline-variant); margin: 8px 0; }
 }
 .toast.show { opacity: 1; transform: translate(-50%, 0); }
 
+/* ---- bottom sheet ------------------------------------------------------ */
+
+dialog.sheet {
+  /* Pinned to the bottom rather than centred: it is reached by thumb. */
+  margin: auto auto 0;
+  width: 100%;
+  max-width: var(--max-width);
+  padding: 8px 0 max(16px, env(safe-area-inset-bottom));
+  border-radius: 28px 28px 0 0;
+  background: var(--surface-raised);
+  color: var(--on-surface);
+  border: 0;
+}
+
+dialog.sheet::backdrop { background: rgb(0 0 0 / 40%); }
+
+.sheet-grabber {
+  width: 32px;
+  height: 4px;
+  margin: 0 auto 12px;
+  border-radius: 2px;
+  background: var(--outline);
+}
+
+.sheet-head { padding: 0 24px 12px; border-bottom: 1px solid var(--outline-variant); }
+.sheet-head strong { display: block; font-size: 15px; font-weight: 500; }
+.sheet-head span { font-size: 13px; color: var(--on-surface-variant); }
+
+.sheet-items { list-style: none; margin: 8px 0 0; padding: 0; }
+.sheet-items button {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  width: 100%;
+  min-height: 48px;
+  padding: 0 24px;
+  font-size: 15px;
+  text-align: left;
+  color: inherit;
+}
+.sheet-items button:hover { background: var(--surface-variant); }
+.sheet-items button:focus-visible { outline: 2px solid var(--primary); outline-offset: -2px; }
+.sheet-items button.danger { color: var(--danger); }
+.sheet-items svg { width: 22px; height: 22px; fill: currentColor; flex: none; }
+
+@media (prefers-reduced-motion: no-preference) {
+  dialog.sheet[open] { animation: sheet-up 180ms cubic-bezier(0.2, 0, 0, 1); }
+}
+@keyframes sheet-up { from { transform: translateY(100%); } to { transform: translateY(0); } }
+
 dialog {
   border: 0;
   border-radius: 28px;

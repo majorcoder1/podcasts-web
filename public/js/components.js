@@ -18,7 +18,7 @@ function downloadIcon(episode) {
  * play button, duration, queue, download and overflow.
  */
 export function episodeRow(episode, options = {}) {
-  const { playingGuid, showTitle, showArtwork = false, inQueue = false } = options;
+  const { playingGuid, showTitle, showArtwork = false } = options;
   const isPlaying = playingGuid === episode.guid && options.isPlaying;
   const done = effectivelyFinished(episode);
   const started = hasStarted(episode);
@@ -50,17 +50,14 @@ export function episodeRow(episode, options = {}) {
         <div>${escapeHtml(meta)}</div>
         ${started ? `<div class="track"><div style="width:${(progress(episode) * 100).toFixed(1)}%"></div></div>` : ''}
       </div>
-      <button class="icon-button" data-action="${inQueue ? 'dequeue' : 'enqueue'}" data-guid="${escapeHtml(episode.guid)}"
-              title="${inQueue ? 'Remove from queue' : 'Add to queue'}" aria-label="${inQueue ? 'Remove from queue' : 'Add to queue'}">
-        ${icon(inQueue ? 'remove' : 'queueAdd')}
-      </button>
       <button class="icon-button ${dl.active ? 'active' : ''}" data-action="download" data-guid="${escapeHtml(episode.guid)}"
               title="${dl.label}" aria-label="${dl.label}">
         ${icon(dl.name)}
       </button>
-      <button class="icon-button ${done ? 'done' : ''}" data-action="played" data-guid="${escapeHtml(episode.guid)}"
-              title="${done ? 'Mark unplayed' : 'Mark played'}" aria-label="${done ? 'Mark unplayed' : 'Mark played'}">
-        ${icon(done ? 'checkCircle' : 'more')}
+      <button class="icon-button" data-action="menu" data-guid="${escapeHtml(episode.guid)}"
+              title="More options" aria-label="More options for ${escapeHtml(episode.title)}"
+              aria-haspopup="dialog">
+        ${icon('more')}
       </button>
     </div>
   </article>`;

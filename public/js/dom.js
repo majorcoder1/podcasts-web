@@ -65,9 +65,21 @@ export function toast(message) {
   toastTimer = setTimeout(() => node.classList.remove('show'), 3200);
 }
 
-/** One delegated listener per screen beats hundreds of per-row handlers. */
+const ACTION_LISTENER = Symbol('actionListener');
+
+/**
+ * One delegated listener per screen beats hundreds of per-row handlers.
+ *
+ * Views re-bind on every render against the same long-lived element, so the
+ * previous listener is removed first. Without that they accumulate and a single
+ * tap fires once per render that has happened - which showed up as repeated
+ * toasts and, once menus existed, a stack of dialogs.
+ */
 export function onAction(root, handlers) {
-  root.addEventListener('click', (event) => {
+  if (root[ACTION_LISTENER]) {
+    root.removeEventListener('click', root[ACTION_LISTENER]);
+  }
+  const listener = (event) => {
     const target = event.target.closest('[data-action]');
     if (!target || !root.contains(target)) return;
     const handler = handlers[target.dataset.action];
@@ -75,5 +87,7 @@ export function onAction(root, handlers) {
     event.preventDefault();
     event.stopPropagation();
     handler(target.dataset, target, event);
-  });
+  };
+  root[ACTION_LISTENER] = listener;
+  root.addEventListener('click', listener);
 }

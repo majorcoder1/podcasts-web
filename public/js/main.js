@@ -6,6 +6,7 @@ import * as downloads from './downloads.js';
 import * as chrome from './chrome.js';
 import * as account from './account.js';
 import { onAction, toast } from './dom.js';
+import { openSheet } from './menu.js';
 
 import * as home from './views/home.js';
 import * as explore from './views/explore.js';
@@ -106,12 +107,7 @@ function bindEpisodeActions(root, extra = {}) {
       render();
     },
     download: ({ guid }) => handleDownload(guid),
-    played: async ({ guid }) => {
-      const episode = await store.getEpisode(guid);
-      if (!episode) return;
-      await store.markCompleted(guid, !episode.isCompleted);
-      render();
-    },
+    menu: ({ guid }) => openEpisodeMenu(guid),
     search: () => {
       explore.focusSearch();
       navigate('/explore');
@@ -119,6 +115,89 @@ function bindEpisodeActions(root, extra = {}) {
     settings: () => navigate('/settings'),
     ...extra,
   });
+}
+
+/**
+ * Everything you can do to an episode, in one sheet.
+ *
+ * The row used to carry these as separate icons, and "mark played" wore a
+ * three-dot icon that promised a menu and never opened one - tapping it made
+ * the episode vanish from Home, because Home only lists unplayed episodes.
+ */
+async function openEpisodeMenu(guid) {
+  const episode = await store.getEpisode(guid);
+  if (!episode) return;
+
+  const [show, queued] = await Promise.all([
+    store.getPodcast(episode.feedUrl),
+    store.isQueued(guid),
+  ]);
+  const downloaded = episode.downloadState === 'DOWNLOADED';
+  const played = episode.isCompleted;
+
+  const items = [
+    {
+      icon: 'queueMusic',
+      label: 'Play next',
+      action: async () => {
+        await store.addToQueue(guid, true);
+        toast('Playing next');
+        render();
+      },
+    },
+    queued
+      ? {
+          icon: 'remove',
+          label: 'Remove from queue',
+          action: async () => {
+            await store.removeFromQueue(guid);
+            toast('Removed from queue');
+            render();
+          },
+        }
+      : {
+          icon: 'queueAdd',
+          label: 'Add to queue',
+          action: async () => {
+            await store.addToQueue(guid);
+            toast('Added to queue');
+            render();
+          },
+        },
+    {
+      icon: downloaded ? 'downloadDone' : 'download',
+      label: downloaded ? 'Remove download' : 'Download',
+      action: () => handleDownload(guid),
+    },
+    {
+      icon: played ? 'remove' : 'checkCircle',
+      label: played ? 'Mark as unplayed' : 'Mark as played',
+      action: async () => {
+        await store.markCompleted(guid, !played);
+        // Marking played removes it from Home, so say so rather than letting
+        // the row silently disappear.
+        toast(played ? 'Marked unplayed' : 'Marked as played');
+        render();
+      },
+    },
+    {
+      icon: 'podcast',
+      label: 'Go to show',
+      action: () => navigate(`/show/${encodeURIComponent(episode.feedUrl)}`),
+    },
+    {
+      icon: 'delete',
+      label: 'Hide this episode',
+      danger: true,
+      action: async () => {
+        await store.archive(guid);
+        toast('Episode hidden');
+        render();
+      },
+    },
+  ];
+
+  openSheet({ title: episode.title, subtitle: show?.title, items });
 }
 
 async function toggleEpisode(guid) {
