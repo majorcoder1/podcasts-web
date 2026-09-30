@@ -201,7 +201,8 @@ img { display: block; max-width: 100%; }
   padding: 0 8px 0 12px;
 }
 
-.mini-body .art { width: 40px; height: 40px; border-radius: 4px; flex: none; }
+.mini-body .art,
+.mini-body .art-fallback { width: 40px; height: 40px; border-radius: 4px; flex: none; }
 .mini-text { flex: 1; min-width: 0; text-align: left; }
 .mini-text strong { display: block; font-size: 14px; font-weight: 500; }
 .mini-text span { font-size: 12px; color: var(--on-surface-variant); }

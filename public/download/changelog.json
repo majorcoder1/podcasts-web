@@ -1,5 +1,19 @@
 [
   {
+    "date": "2026-09-29",
+    "version": "1.0.4",
+    "title": "Player bar artwork fix",
+    "sections": [
+      {
+        "heading": "Fixes",
+        "items": [
+          "When a show's cover picture failed to load, the small square in the player bar at the bottom shrank to nothing and dragged the episode title out of place. It now keeps its size and shows a podcast symbol instead.",
+          "The stand-in picture had stopped appearing anywhere on the site. A security rule added in the last update blocked the code that swapped it in, so a cover that would not load simply left an empty gap."
+        ]
+      }
+    ]
+  },
+  {
     "date": "2026-09-24",
     "version": "1.0.3",
     "title": "Security update, fixes and shortcuts",
