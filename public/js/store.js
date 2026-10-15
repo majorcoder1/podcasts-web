@@ -64,11 +64,21 @@ export function getPodcast(feedUrl) {
   return db.get('podcasts', feedUrl);
 }
 
+// The show with the newest episode comes first, so a fresh drop moves its show
+// to the front; shows with no episodes yet fall back to when they were added.
 export async function subscriptions() {
-  const all = await db.getAll('podcasts');
+  const [all, episodes] = await Promise.all([db.getAll('podcasts'), db.getAll('episodes')]);
+  const latest = new Map();
+  for (const episode of episodes) {
+    if ((episode.publishedAt || 0) > (latest.get(episode.feedUrl) || 0)) {
+      latest.set(episode.feedUrl, episode.publishedAt);
+    }
+  }
   return all
     .filter((podcast) => podcast.isSubscribed)
-    .sort((a, b) => (b.subscribedAt || 0) - (a.subscribedAt || 0));
+    .sort((a, b) =>
+      (latest.get(b.feedUrl) || 0) - (latest.get(a.feedUrl) || 0)
+      || (b.subscribedAt || 0) - (a.subscribedAt || 0));
 }
 
 export async function subscribe(feedUrl) {

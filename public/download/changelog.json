@@ -1,5 +1,20 @@
 [
   {
+    "date": "2026-10-15",
+    "version": "1.0.9",
+    "title": "Newest shows first",
+    "sections": [
+      {
+        "heading": "Subscriptions",
+        "items": [
+          "Your subscriptions are now ordered by their newest episode. Whichever show dropped most recently comes first, then the next newest, and so on.",
+          "When a show releases a new episode, it moves to the front on its own.",
+          "Works the same in the Android app and the web player."
+        ]
+      }
+    ]
+  },
+  {
     "date": "2026-09-30",
     "version": "1.0.6",
     "title": "Show links survive a refresh",
