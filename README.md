@@ -160,3 +160,9 @@ Not omissions — things the platform decides:
 ## Licence
 
 Apache 2.0.
+
+## Support
+
+This project is free and open source. If it is useful to you, you can support my work with a donation:
+
+[![Donate using Liberapay](https://liberapay.com/assets/widgets/donate.svg)](https://liberapay.com/majorcoder1/donate)
