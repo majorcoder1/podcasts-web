@@ -18,6 +18,14 @@
           "Search now hides feeds you would not want: shows that have not posted in six months, feeds with no episodes, and copies of a show that someone else re-posts under the same name. When a show has moved to a new host, only its live feed is listed. X22 Report and The Shawn Ryan Show were each showing twice this way.",
           "If a search finds no live shows at all, it lists the older ones instead of nothing, so finished archive shows such as Apostolic Classics can still be found."
         ]
+      },
+      {
+        "heading": "Apostolic Classics in one feed",
+        "items": [
+          "Apostolic Classics was spread over five separate podcast feeds. Its episodes are now gathered into one show, newest first, with repeats removed: 351 sermons.",
+          "Subscribe by pasting https://podcast.4thepeople.live/feeds/apostolic-classics.xml into the app or the web player.",
+          "Nothing was copied. Every sermon still plays from the Apostolic Classics archive."
+        ]
       }
     ]
   },

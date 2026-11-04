@@ -1,0 +1,15 @@
+{
+  "output": "public/feeds/apostolic-classics.xml",
+  "title": "Apostolic Classics (All Feeds)",
+  "author": "Apostolic Classics",
+  "link": "https://apostolicclassics.sermon.net",
+  "description": "Every Apostolic Classics sermon from its separate podcast feeds, gathered into one list, newest first. The audio plays from the Apostolic Classics archive.",
+  "image": "https://storage.sermon.net/1beed425889e643974908b4654ed96ee/0-0-0/content/media/22661/artwork/27c44e01c51438ee34a4271e8c298a61.png",
+  "sources": [
+    "https://apostolicclassics.sermon.net/rss/main",
+    "https://feeds.feedburner.com/ApostolicClassicsVault",
+    "https://apostolicclassics.sermon.net/rss/jamesgroce/audio_pdf",
+    "https://www.apostolicvault.com/admin/podcastgen/feed.xml",
+    "https://feeds.feedburner.com/Sermons-ApostolicClassics"
+  ]
+}
