@@ -684,8 +684,18 @@ function handle_search(): void
     $limit  = clamp_int(isset($_GET['limit']) ? $_GET['limit'] : '', 1, 200, 50);
     $credentials = podcastindex_credentials();
     if ($credentials !== null) {
-        $payload = podcastindex_get('/search/byterm', array('q' => $term, 'max' => $limit), $credentials);
-        send_body(podcastindex_results($payload['feeds'] ?? array()),
+        // byterm alone misses some well-known shows (The Sean Ryan Show among
+        // them), so title matches go first and term matches fill in behind.
+        $titles = podcastindex_get('/search/bytitle', array('q' => $term, 'max' => $limit, 'similar' => 'true'), $credentials);
+        $terms  = podcastindex_get('/search/byterm', array('q' => $term, 'max' => $limit), $credentials);
+        $feeds  = array();
+        foreach (array_merge($titles['feeds'] ?? array(), $terms['feeds'] ?? array()) as $feed) {
+            $url = (string) ($feed['url'] ?? '');
+            if ($url !== '' && !isset($feeds[$url])) {
+                $feeds[$url] = $feed;
+            }
+        }
+        send_body(podcastindex_results(array_slice(array_values($feeds), 0, $limit)),
             'application/json; charset=utf-8', 'public, max-age=600');
     }
     $target = ITUNES_SEARCH . '?' . http_build_query(array(
