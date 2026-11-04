@@ -24,7 +24,7 @@ const ITUNES_CHARTS = 'https://itunes.apple.com/us/rss/toppodcasts';
  */
 const PROXY_LIMITS = array(
     'feed'   => array(300, 1200),   // per 10 minutes
-    'search' => array(120, 600),
+    'search' => array(300, 1200),
     'charts' => array(120, 600),
     'audio'  => array(30, 200),     // per hour: each one can be a whole episode
 );
@@ -226,7 +226,7 @@ function stream_pin(array $target, string $url): array
  *
  * @return array{body:string,type:string}
  */
-function fetch_url(string $url, string $accept, int $limit): array
+function fetch_url(string $url, string $accept, int $limit, array $headers = array()): array
 {
     $hops = 0;
 
@@ -234,8 +234,8 @@ function fetch_url(string $url, string $accept, int $limit): array
         $target = assert_public_url($url);
 
         $result = function_exists('curl_init')
-            ? fetch_with_curl($url, $target, $accept, $limit)
-            : fetch_with_streams($url, $target, $accept, $limit);
+            ? fetch_with_curl($url, $target, $accept, $limit, $headers)
+            : fetch_with_streams($url, $target, $accept, $limit, $headers);
 
         if ($result['redirect'] !== null) {
             if (++$hops > MAX_REDIRECTS) {
@@ -255,7 +255,7 @@ function fetch_url(string $url, string $accept, int $limit): array
     }
 }
 
-function fetch_with_curl(string $url, array $target, string $accept, int $limit): array
+function fetch_with_curl(string $url, array $target, string $accept, int $limit, array $headers = array()): array
 {
     $handle = curl_init($url);
     curl_setopt_array($handle, array(
@@ -268,7 +268,7 @@ function fetch_with_curl(string $url, array $target, string $accept, int $limit)
         CURLOPT_TIMEOUT          => FETCH_TIMEOUT,
         CURLOPT_ENCODING         => '',
         CURLOPT_USERAGENT        => USER_AGENT,
-        CURLOPT_HTTPHEADER       => array('Accept: ' . $accept),
+        CURLOPT_HTTPHEADER       => array_merge(array('Accept: ' . $accept), $headers),
         CURLOPT_NOPROGRESS       => false,
         CURLOPT_PROGRESSFUNCTION => function ($resource, $downloaded) use ($limit) {
             return $downloaded > $limit ? 1 : 0;   // non-zero aborts the transfer
@@ -297,7 +297,7 @@ function fetch_with_curl(string $url, array $target, string $accept, int $limit)
 }
 
 /** Opens a pinned stream; returns [resource, status, type, redirect, length]. */
-function open_stream(string $url, array $target, string $accept, int $timeout): array
+function open_stream(string $url, array $target, string $accept, int $timeout, array $headers = array()): array
 {
     if (!ini_get('allow_url_fopen')) {
         fail(500, 'This host has neither cURL nor allow_url_fopen enabled');
@@ -308,7 +308,8 @@ function open_stream(string $url, array $target, string $accept, int $timeout): 
         'http' => array(
             'method'          => 'GET',
             'header'          => 'Host: ' . $hostHeader . "\r\nUser-Agent: " . USER_AGENT
-                . "\r\nAccept: " . $accept . "\r\n",
+                . "\r\nAccept: " . $accept . "\r\n"
+                . ($headers ? implode("\r\n", $headers) . "\r\n" : ''),
             'timeout'         => $timeout,
             'follow_location' => 0,
             'ignore_errors'   => true,
@@ -343,9 +344,9 @@ function open_stream(string $url, array $target, string $accept, int $timeout): 
     return array($stream, $status, $type, $redirect, $length);
 }
 
-function fetch_with_streams(string $url, array $target, string $accept, int $limit): array
+function fetch_with_streams(string $url, array $target, string $accept, int $limit, array $headers = array()): array
 {
-    list($stream, $status, $type, $redirect) = open_stream($url, $target, $accept, FETCH_TIMEOUT);
+    list($stream, $status, $type, $redirect) = open_stream($url, $target, $accept, FETCH_TIMEOUT, $headers);
     if ($redirect !== null) {
         fclose($stream);
         return array('redirect' => $redirect, 'status' => $status, 'body' => '', 'type' => '');
@@ -580,6 +581,87 @@ function cached_feed(string $url): string
     return $result['body'];
 }
 
+// ---- Podcast Index ------------------------------------------------------------
+//
+// Apple's directory began refusing this host (403) and then visitors' own
+// networks, so search and charts go to Podcast Index when its keys are set.
+// The key and secret live in podcastindex.json in the data folder - never in
+// the site files - as {"key": "...", "secret": "..."}.
+
+const PODCASTINDEX_API = 'https://api.podcastindex.org/api/1.0';
+
+/** Apple genre ids, as the front end sends them, to Podcast Index category names. */
+const PODCASTINDEX_CATEGORIES = array(
+    '1489' => 'News',
+    '1303' => 'Comedy',
+    '1488' => 'True Crime',
+    '1545' => 'Sports',
+    '1324' => 'Society,Culture',
+    '1321' => 'Business',
+    '1318' => 'Technology',
+    '1512' => 'Health,Fitness',
+    '1314' => 'Religion,Spirituality',
+    '1487' => 'History',
+    '1304' => 'Education',
+);
+
+function podcastindex_credentials(): ?array
+{
+    $dir = data_dir();
+    if ($dir === null || !is_file($dir . '/podcastindex.json')) {
+        return null;
+    }
+    $config = json_decode((string) @file_get_contents($dir . '/podcastindex.json'), true);
+    $key    = is_array($config) ? trim((string) ($config['key'] ?? '')) : '';
+    $secret = is_array($config) ? trim((string) ($config['secret'] ?? '')) : '';
+    return ($key !== '' && $secret !== '') ? array($key, $secret) : null;
+}
+
+/** One signed request; the API wants sha1(key . secret . unix-time) on every call. */
+function podcastindex_get(string $path, array $query, array $credentials): array
+{
+    list($key, $secret) = $credentials;
+    $time = (string) time();
+    $result = fetch_url(
+        PODCASTINDEX_API . $path . '?' . http_build_query($query),
+        'application/json',
+        MAX_FEED_BYTES,
+        array(
+            'X-Auth-Key: ' . $key,
+            'X-Auth-Date: ' . $time,
+            'Authorization: ' . sha1($key . $secret . $time),
+        )
+    );
+    $decoded = json_decode($result['body'], true);
+    return is_array($decoded) ? $decoded : array();
+}
+
+/**
+ * Podcast Index feeds in the shape the front end already reads from Apple,
+ * so nothing downstream has to know which directory answered.
+ */
+function podcastindex_results(array $feeds): string
+{
+    $results = array();
+    foreach ($feeds as $feed) {
+        $url = (string) ($feed['url'] ?? '');
+        if ($url === '' || !empty($feed['dead'])) {
+            continue;
+        }
+        $categories = is_array($feed['categories'] ?? null) ? array_values($feed['categories']) : array();
+        $art = (string) (($feed['artwork'] ?? '') ?: ($feed['image'] ?? ''));
+        $results[] = array(
+            'feedUrl'          => $url,
+            'collectionName'   => (string) ($feed['title'] ?? ''),
+            'artistName'       => (string) (($feed['author'] ?? '') ?: ($feed['ownerName'] ?? '')),
+            'artworkUrl600'    => $art !== '' ? $art : null,
+            'trackCount'       => (int) ($feed['episodeCount'] ?? 0),
+            'primaryGenreName' => $categories ? (string) $categories[0] : null,
+        );
+    }
+    return json_encode(array('results' => $results, 'source' => 'podcastindex'));
+}
+
 // ---- routes ---------------------------------------------------------------
 
 function handle_feed(): void
@@ -600,6 +682,12 @@ function handle_search(): void
         send_body('{"results":[]}', 'application/json; charset=utf-8', 'no-store');
     }
     $limit  = clamp_int(isset($_GET['limit']) ? $_GET['limit'] : '', 1, 200, 50);
+    $credentials = podcastindex_credentials();
+    if ($credentials !== null) {
+        $payload = podcastindex_get('/search/byterm', array('q' => $term, 'max' => $limit), $credentials);
+        send_body(podcastindex_results($payload['feeds'] ?? array()),
+            'application/json; charset=utf-8', 'public, max-age=600');
+    }
     $target = ITUNES_SEARCH . '?' . http_build_query(array(
         'term'   => $term,
         'media'  => 'podcast',
@@ -615,6 +703,16 @@ function handle_charts(): void
     guard_proxy('charts');
     $genre  = isset($_GET['genre']) ? trim((string) $_GET['genre']) : '';
     $limit  = clamp_int(isset($_GET['limit']) ? $_GET['limit'] : '', 1, 100, 30);
+    $credentials = podcastindex_credentials();
+    if ($credentials !== null) {
+        $query = array('max' => $limit, 'lang' => 'en');
+        if (isset(PODCASTINDEX_CATEGORIES[$genre])) {
+            $query['cat'] = PODCASTINDEX_CATEGORIES[$genre];
+        }
+        $payload = podcastindex_get('/podcasts/trending', $query, $credentials);
+        send_body(podcastindex_results($payload['feeds'] ?? array()),
+            'application/json; charset=utf-8', 'public, max-age=3600');
+    }
     $target = ITUNES_CHARTS . '/limit=' . $limit;
     if ($genre !== '' && ctype_digit($genre)) {
         $target .= '/genre=' . $genre;

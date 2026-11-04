@@ -10,6 +10,13 @@
           "Accounts have no email address, so the reset asks for a reset key that only the site's owner can read on the web host.",
           "Resetting a password signs that account out everywhere, and repeated wrong keys are blocked for an hour."
         ]
+      },
+      {
+        "heading": "Search",
+        "items": [
+          "Search and the top charts now use Podcast Index, an open directory of over four million shows, after Apple's directory started refusing requests.",
+          "Opening a chart no longer fires off two dozen searches at once, which was getting the site blocked."
+        ]
       }
     ]
   },
