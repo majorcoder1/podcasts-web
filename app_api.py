@@ -188,6 +188,19 @@ def invite_code() -> str:
         return handle.read().strip()
 
 
+def reset_key() -> str:
+    """Key for resetting a forgotten password; see reset_key() in accounts.php."""
+    if _db_path is None:
+        return ""
+    path = os.path.join(os.path.dirname(_db_path), "reset-key.txt")
+    if not os.path.isfile(path):
+        with open(path, "w") as handle:
+            handle.write(secrets.token_hex(12) + "\n")
+        os.chmod(path, 0o600)
+    with open(path) as handle:
+        return handle.read().strip()
+
+
 # ---- tokens -----------------------------------------------------------------
 
 
@@ -356,6 +369,30 @@ def change_password(user: sqlite3.Row, payload: dict) -> dict:
     connection.execute(
         "DELETE FROM tokens WHERE user_id = ? AND id <> ?", (user["id"], user["token_id"])
     )
+    connection.commit()
+    return {"ok": True}
+
+
+def reset_password(payload: dict) -> dict:
+    username = str(payload.get("username", "")).strip().lower()
+    supplied = str(payload.get("resetKey", "")).strip()
+    following = str(payload.get("newPassword", ""))
+
+    expected = reset_key()
+    if not expected or not supplied or not secrets.compare_digest(expected, supplied):
+        raise ApiError(403, "That reset key is not right")
+    if len(following) < 8:
+        raise ApiError(400, "Password must be at least 8 characters")
+
+    connection = db()
+    user = connection.execute("SELECT id FROM users WHERE username = ?", (username,)).fetchone()
+    if user is None:
+        raise ApiError(404, "There is no account with that username")
+    connection.execute(
+        "UPDATE users SET password_hash = ?, failed_attempts = 0, locked_until = 0 WHERE id = ?",
+        (hash_password(following), user["id"]),
+    )
+    connection.execute("DELETE FROM tokens WHERE user_id = ?", (user["id"],))
     connection.commit()
     return {"ok": True}
 

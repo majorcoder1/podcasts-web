@@ -294,7 +294,37 @@
                 Sign in
               </button>
             </form>
+              <p class="forgot"><a href="#reset" id="forgot-link">Forgot password?</a></p>
+
             </div>
+
+            <form id="reset-form" hidden aria-labelledby="reset-title">
+              <h3 id="reset-title" class="reset-title">Reset your password</h3>
+              <p class="hint reset-intro">
+                Enter your username, the reset key, and a new password. The reset key is in
+                <strong>reset-key.txt</strong> inside the <strong>podcast-data</strong> folder on the web host.
+              </p>
+              <div class="field">
+                <label for="reset-username">Username</label>
+                <input id="reset-username" name="username" type="text" autocomplete="username"
+                       autocapitalize="none" spellcheck="false" required />
+              </div>
+              <div class="field">
+                <label for="reset-key">Reset key</label>
+                <input id="reset-key" name="reset-key" type="text" autocomplete="off"
+                       autocapitalize="none" spellcheck="false" required />
+              </div>
+              <div class="field">
+                <label for="reset-password">New password</label>
+                <input id="reset-password" name="new-password" type="password"
+                       autocomplete="new-password" aria-describedby="reset-password-hint" required />
+                <div class="hint" id="reset-password-hint">At least 8 characters.</div>
+              </div>
+              <button class="btn btn-primary" type="submit" id="reset-submit" style="width: 100%">
+                Set new password
+              </button>
+              <p class="forgot"><a href="#account" id="reset-back">Back to sign in</a></p>
+            </form>
           </div>
         </div>
       </section>

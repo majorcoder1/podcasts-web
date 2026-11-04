@@ -40,6 +40,26 @@ function is_first_run(): bool
     }
 }
 
+/**
+ * Key for resetting a forgotten password. Accounts carry no email address to
+ * send a link to, so whoever can open the data folder on the host is the one
+ * who may reset. Created on first use; read it with the host's file manager.
+ */
+function reset_key(): string
+{
+    $dir = data_dir();
+    if ($dir === null) {
+        return '';
+    }
+    $path = $dir . '/reset-key.txt';
+    if (!is_file($path)) {
+        @file_put_contents($path, bin2hex(random_bytes(12)) . "\n", LOCK_EX);
+        @chmod($path, 0600);
+    }
+    $key = @file_get_contents($path);
+    return $key === false ? '' : trim($key);
+}
+
 function issue_token(int $userId, string $device): string
 {
     $token = bin2hex(random_bytes(32));
@@ -293,6 +313,40 @@ function handle_change_password(array $input): void
     // Changing a password should end every other session.
     db()->prepare('DELETE FROM tokens WHERE user_id = ? AND id <> ?')
         ->execute(array($user['id'], $user['token_id']));
+
+    json_out(array('ok' => true));
+}
+
+function handle_reset_password(array $input): void
+{
+    // Few honest people need more than a couple of tries; a guesser needs millions.
+    if (!rate_limit_take('reset', 10, 3600)) {
+        fail(429, 'Too many attempts. Try again in an hour.');
+    }
+
+    $username = normalise_username(field($input, 'username'));
+    $supplied = field($input, 'resetKey');
+    $next     = field($input, 'newPassword');
+
+    $expected = reset_key();
+    if ($expected === '' || $supplied === '' || !hash_equals($expected, $supplied)) {
+        fail(403, 'That reset key is not right');
+    }
+    if (strlen($next) < 8) {
+        fail(400, 'Password must be at least 8 characters');
+    }
+
+    $statement = db()->prepare('SELECT id FROM users WHERE username = ?');
+    $statement->execute(array($username));
+    $user = $statement->fetch();
+    if (!$user) {
+        fail(404, 'There is no account with that username');
+    }
+
+    db()->prepare('UPDATE users SET password_hash = ?, failed_attempts = 0, locked_until = 0 WHERE id = ?')
+        ->execute(array(password_hash($next, PASSWORD_DEFAULT), $user['id']));
+    // Whoever was signed in with the old password is signed out everywhere.
+    db()->prepare('DELETE FROM tokens WHERE user_id = ?')->execute(array($user['id']));
 
     json_out(array('ok' => true));
 }

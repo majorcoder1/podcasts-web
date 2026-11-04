@@ -62,3 +62,7 @@ export async function signOut() {
 export async function changePassword(currentPassword, newPassword) {
   return call('/api/password', { currentPassword, newPassword });
 }
+
+export async function resetPassword(username, resetKey, newPassword) {
+  return call('/api/reset', { username, resetKey, newPassword });
+}

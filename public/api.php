@@ -76,6 +76,9 @@ switch ($route) {
     case 'logout':
         handle_logout();
 
+    case 'reset':
+        handle_reset_password(require_json_post());
+
     case 'me':
         handle_me();
 

@@ -1,5 +1,19 @@
 [
   {
+    "date": "2026-11-03",
+    "title": "Forgot your password?",
+    "sections": [
+      {
+        "heading": "Website",
+        "items": [
+          "The sign-in box has a \"Forgot password?\" link that lets you set a new password.",
+          "Accounts have no email address, so the reset asks for a reset key that only the site's owner can read on the web host.",
+          "Resetting a password signs that account out everywhere, and repeated wrong keys are blocked for an hour."
+        ]
+      }
+    ]
+  },
+  {
     "date": "2026-10-15",
     "version": "1.0.9",
     "title": "Newest shows first",

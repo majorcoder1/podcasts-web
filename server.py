@@ -141,7 +141,7 @@ def cached_feed(url: str) -> tuple[bytes, str]:
 
 
 ACCOUNT_ROUTES = {
-    "/api/register", "/api/login", "/api/logout", "/api/me", "/api/password",
+    "/api/register", "/api/login", "/api/logout", "/api/me", "/api/password", "/api/reset",
 }
 
 
@@ -286,6 +286,9 @@ class Handler(BaseHTTPRequestHandler):
             return self.send_json({"user": None} if user is None else {
                 "user": {"username": user["username"], "displayName": user["display_name"]}
             })
+
+        if route == "/api/reset":
+            return self.send_json(app_api.reset_password(self.require_json_post()))
 
         if route == "/api/password":
             user = self.require_user()

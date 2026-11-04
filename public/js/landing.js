@@ -123,6 +123,63 @@ form.addEventListener('submit', async (event) => {
   }
 });
 
+// ---- forgotten password ------------------------------------------------------
+
+const resetForm = document.getElementById('reset-form');
+const tabsRow = document.querySelector('#account-card .tabs-row');
+
+/** Swap the sign-in box for the reset form, or back. */
+function showReset(on) {
+  resetForm.hidden = !on;
+  authPanel.hidden = on;
+  if (tabsRow) tabsRow.hidden = on;
+  say('');
+  if (on) {
+    const typed = document.getElementById('username').value.trim();
+    if (typed) document.getElementById('reset-username').value = typed;
+    document.getElementById(typed ? 'reset-key' : 'reset-username').focus();
+  }
+}
+
+document.getElementById('forgot-link').addEventListener('click', (event) => {
+  event.preventDefault();
+  history.replaceState(null, '', '#reset');
+  showReset(true);
+});
+
+document.getElementById('reset-back').addEventListener('click', (event) => {
+  event.preventDefault();
+  history.replaceState(null, '', location.pathname + location.search);
+  showReset(false);
+  document.getElementById('username').focus();
+});
+
+resetForm.addEventListener('submit', async (event) => {
+  event.preventDefault();
+  const username = document.getElementById('reset-username').value.trim();
+  const key = document.getElementById('reset-key').value.trim();
+  const password = document.getElementById('reset-password').value;
+  if (!username || !key || !password) return say('Fill in all three fields.');
+
+  const button = document.getElementById('reset-submit');
+  button.disabled = true;
+  say('');
+  try {
+    await account.resetPassword(username, key, password);
+    showReset(false);
+    history.replaceState(null, '', location.pathname + location.search);
+    setMode('signin');
+    document.getElementById('username').value = username;
+    passwordInput.value = '';
+    passwordInput.focus();
+    say('Password changed. Sign in with your new password.', 'ok');
+  } catch (error) {
+    say(error.message || 'That did not work.');
+  } finally {
+    button.disabled = false;
+  }
+});
+
 tabSignIn.addEventListener('click', () => setMode('signin'));
 tabRegister.addEventListener('click', () => setMode('register'));
 
@@ -363,6 +420,11 @@ async function loadRelease() {
 (async function boot() {
   await loadServerConfig();
   setMode('signin');
+  // A shared /#reset link opens straight to the reset form.
+  if (location.hash === '#reset') {
+    document.getElementById('account')?.scrollIntoView();
+    showReset(true);
+  }
   loadRelease();
 
   const user = await account.currentUser();
