@@ -100,6 +100,9 @@ switch ($route) {
     case 'charts':
         handle_charts();
 
+    case 'stats':
+        handle_stats();
+
     case 'audio':
         handle_audio();
 

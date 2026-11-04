@@ -11,7 +11,7 @@
     RewriteEngine On
 
     # /api/<name> -> api.php, which routes on the last path segment.
-    RewriteRule ^api/(health|register|login|logout|me|password|reset|sync|feed|search|charts|audio)/?$ api.php [QSA,L]
+    RewriteRule ^api/(health|register|login|logout|me|password|reset|sync|feed|search|charts|stats|audio)/?$ api.php [QSA,L]
 
     # The player is a single-page app mounted at /app, so /app/show/... has to
     # survive a refresh or a shared link.

@@ -15,7 +15,7 @@
         "heading": "Website",
         "items": [
           "Search now matches show titles as well as general words, which finds shows the old search missed, such as The Shawn Ryan Show.",
-          "When a show has moved to a new host, search only lists its live feed, so the old copy that stopped updating no longer appears beside it. X22 Report was showing twice this way. Shows that have stopped posting for six months are listed after the live ones."
+          "Search now hides feeds you would not want: shows that have not posted in six months, feeds with no episodes, and copies of a show that someone else re-posts under the same name. When a show has moved to a new host, only its live feed is listed. X22 Report and The Shawn Ryan Show were each showing twice this way."
         ]
       }
     ]

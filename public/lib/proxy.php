@@ -636,12 +636,9 @@ function podcastindex_get(string $path, array $query, array $credentials): array
     return is_array($decoded) ? $decoded : array();
 }
 
-/**
- * Podcast Index feeds in the shape the front end already reads from Apple,
- * so nothing downstream has to know which directory answered.
- */
-// When a show has moved host, Podcast Index keeps both feeds under the same
-// title. Only the copy with the newest episode is kept.
+// Podcast Index lists every feed ever submitted, so search hides the ones
+// nobody should subscribe to: feeds that stopped posting six months ago, feeds
+// with no episodes, and copies of a show re-posted under the same title.
 const PODCASTINDEX_STALE_AFTER = 183 * 86400;
 
 function podcastindex_newest(array $feed): int
@@ -651,43 +648,90 @@ function podcastindex_newest(array $feed): int
         ?: ($feed['lastUpdateTime'] ?? 0));
 }
 
+/** "The Shawn Ryan Show" and "Shawn Ryan Show!" are the same show. */
+function podcastindex_title_key(array $feed): string
+{
+    $title = strtolower((string) ($feed['title'] ?? ''));
+    $title = preg_replace('/^the\s+/', '', $title);
+    return (string) preg_replace('/[^a-z0-9]+/', '', $title);
+}
+
+/**
+ * Two feeds with the same title are copies of one show when they share
+ * artwork or carry nearly the same number of episodes. Unrelated shows that
+ * happen to share a name usually differ on both, and are both kept.
+ */
+function podcastindex_is_copy(array $a, array $b): bool
+{
+    $hashA = (string) ($a['imageUrlHash'] ?? '');
+    if ($hashA !== '' && $hashA === (string) ($b['imageUrlHash'] ?? '')) {
+        return true;
+    }
+    $countA = (int) ($a['episodeCount'] ?? 0);
+    $countB = (int) ($b['episodeCount'] ?? 0);
+    return abs($countA - $countB) <= 0.15 * max($countA, $countB);
+}
+
+/**
+ * Podcast Index feeds in the shape the front end already reads from Apple,
+ * so nothing downstream has to know which directory answered.
+ */
 function podcastindex_results(array $feeds): string
 {
-    $newestByTitle = array();
-    foreach ($feeds as $feed) {
-        $title = strtolower(trim((string) ($feed['title'] ?? '')));
-        $newestByTitle[$title] = max($newestByTitle[$title] ?? 0, podcastindex_newest($feed));
-    }
-
-    $results = array();
-    $stale = array();
+    $hidden = array('stale' => 0, 'empty' => 0, 'duplicate' => 0);
+    $live = array();
     foreach ($feeds as $feed) {
         $url = (string) ($feed['url'] ?? '');
-        if ($url === '' || !empty($feed['dead'])) {
+        if ($url === '') {
             continue;
         }
         $newest = podcastindex_newest($feed);
-        $isStale = $newest > 0 && $newest < time() - PODCASTINDEX_STALE_AFTER;
-        $title = strtolower(trim((string) ($feed['title'] ?? '')));
-        if ($newest < $newestByTitle[$title] && ($isStale || $newestByTitle[$title] - $newest > 30 * 86400)) {
+        if (!empty($feed['dead']) || ($newest > 0 && $newest < time() - PODCASTINDEX_STALE_AFTER)) {
+            $hidden['stale']++;
+        } elseif (isset($feed['episodeCount']) && (int) $feed['episodeCount'] === 0) {
+            $hidden['empty']++;
+        } else {
+            $live[] = $feed;
+        }
+    }
+
+    // The original is the copy that posted most recently, then the longest.
+    $ranked = $live;
+    usort($ranked, function (array $a, array $b): int {
+        return array(podcastindex_newest($b), (int) ($b['episodeCount'] ?? 0))
+            <=> array(podcastindex_newest($a), (int) ($a['episodeCount'] ?? 0));
+    });
+    $originals = array();
+    $copies = array();
+    foreach ($ranked as $feed) {
+        $key = podcastindex_title_key($feed);
+        foreach ($originals[$key] ?? array() as $original) {
+            if (podcastindex_is_copy($original, $feed)) {
+                $copies[$feed['url']] = true;
+                continue 2;
+            }
+        }
+        $originals[$key][] = $feed;
+    }
+    $hidden['duplicate'] = count($copies);
+
+    $results = array();
+    foreach ($live as $feed) {
+        if (isset($copies[$feed['url']])) {
             continue;
         }
         $categories = is_array($feed['categories'] ?? null) ? array_values($feed['categories']) : array();
         $art = (string) (($feed['artwork'] ?? '') ?: ($feed['image'] ?? ''));
         $results[] = array(
-            'feedUrl'          => $url,
+            'feedUrl'          => (string) $feed['url'],
             'collectionName'   => (string) ($feed['title'] ?? ''),
             'artistName'       => (string) (($feed['author'] ?? '') ?: ($feed['ownerName'] ?? '')),
             'artworkUrl600'    => $art !== '' ? $art : null,
             'trackCount'       => (int) ($feed['episodeCount'] ?? 0),
             'primaryGenreName' => $categories ? (string) $categories[0] : null,
         );
-        // Finished shows that no longer post still appear, after the live ones.
-        if ($isStale) {
-            $stale[] = array_pop($results);
-        }
     }
-    return json_encode(array('results' => array_merge($results, $stale), 'source' => 'podcastindex'));
+    return json_encode(array('results' => $results, 'hidden' => $hidden, 'source' => 'podcastindex'));
 }
 
 // ---- routes ---------------------------------------------------------------
@@ -758,6 +802,18 @@ function handle_charts(): void
     $target .= '/json';
     $result = fetch_url($target, 'application/json', MAX_FEED_BYTES);
     send_body($result['body'], 'application/json; charset=utf-8', 'public, max-age=3600');
+}
+
+/** Directory-wide counts from Podcast Index: total feeds and how many still post. */
+function handle_stats(): void
+{
+    guard_proxy('charts');
+    $credentials = podcastindex_credentials();
+    if ($credentials === null) {
+        fail(503, 'Directory not configured');
+    }
+    $payload = podcastindex_get('/stats/current', array(), $credentials);
+    send_body(json_encode($payload['stats'] ?? array()), 'application/json; charset=utf-8', 'public, max-age=86400');
 }
 
 function handle_audio(): void
