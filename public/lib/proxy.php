@@ -640,12 +640,36 @@ function podcastindex_get(string $path, array $query, array $credentials): array
  * Podcast Index feeds in the shape the front end already reads from Apple,
  * so nothing downstream has to know which directory answered.
  */
+// When a show has moved host, Podcast Index keeps both feeds under the same
+// title. Only the copy with the newest episode is kept.
+const PODCASTINDEX_STALE_AFTER = 183 * 86400;
+
+function podcastindex_newest(array $feed): int
+{
+    return (int) (($feed['newestItemPubdate'] ?? 0)
+        ?: ($feed['newestItemPublishTime'] ?? 0)
+        ?: ($feed['lastUpdateTime'] ?? 0));
+}
+
 function podcastindex_results(array $feeds): string
 {
+    $newestByTitle = array();
+    foreach ($feeds as $feed) {
+        $title = strtolower(trim((string) ($feed['title'] ?? '')));
+        $newestByTitle[$title] = max($newestByTitle[$title] ?? 0, podcastindex_newest($feed));
+    }
+
     $results = array();
+    $stale = array();
     foreach ($feeds as $feed) {
         $url = (string) ($feed['url'] ?? '');
         if ($url === '' || !empty($feed['dead'])) {
+            continue;
+        }
+        $newest = podcastindex_newest($feed);
+        $isStale = $newest > 0 && $newest < time() - PODCASTINDEX_STALE_AFTER;
+        $title = strtolower(trim((string) ($feed['title'] ?? '')));
+        if ($newest < $newestByTitle[$title] && ($isStale || $newestByTitle[$title] - $newest > 30 * 86400)) {
             continue;
         }
         $categories = is_array($feed['categories'] ?? null) ? array_values($feed['categories']) : array();
@@ -658,8 +682,12 @@ function podcastindex_results(array $feeds): string
             'trackCount'       => (int) ($feed['episodeCount'] ?? 0),
             'primaryGenreName' => $categories ? (string) $categories[0] : null,
         );
+        // Finished shows that no longer post still appear, after the live ones.
+        if ($isStale) {
+            $stale[] = array_pop($results);
+        }
     }
-    return json_encode(array('results' => $results, 'source' => 'podcastindex'));
+    return json_encode(array('results' => array_merge($results, $stale), 'source' => 'podcastindex'));
 }
 
 // ---- routes ---------------------------------------------------------------
