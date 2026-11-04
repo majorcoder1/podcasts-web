@@ -676,7 +676,52 @@ function podcastindex_is_copy(array $a, array $b): bool
  * Podcast Index feeds in the shape the front end already reads from Apple,
  * so nothing downstream has to know which directory answered.
  */
-function podcastindex_results(array $feeds): string
+/**
+ * Shows this site combines from several feeds (built by tools/combine-feeds.py).
+ * A search that matches one lists the combined show once, first, and drops
+ * the separate feeds it was made from.
+ */
+function combined_feeds_for(string $term, array &$feeds): array
+{
+    $index = json_decode((string) @file_get_contents(__DIR__ . '/../feeds/combined.json'), true);
+    if (!is_array($index)) {
+        return array();
+    }
+    $bare = function (string $url): string {
+        return rtrim((string) preg_replace('#^https?://#i', '', strtolower($url)), '/');
+    };
+    $term = strtolower($term);
+    $pinned = array();
+    foreach ($index as $feedUrl => $show) {
+        $sources = array_map($bare, $show['feeds'] ?? array());
+        $hosts = $show['hosts'] ?? array();
+        $matched = false;
+        foreach ($show['terms'] ?? array() as $phrase) {
+            $matched = $matched || strpos($term, $phrase) !== false || strpos($phrase, $term) !== false;
+        }
+        foreach ($feeds as $i => $feed) {
+            $url = (string) ($feed['url'] ?? '');
+            if (in_array($bare($url), $sources, true) || in_array(strtolower((string) parse_url($url, PHP_URL_HOST)), $hosts, true)) {
+                unset($feeds[$i]);
+                $matched = true;
+            }
+        }
+        if ($matched) {
+            $pinned[] = array(
+                'feedUrl'          => $feedUrl,
+                'collectionName'   => (string) $show['title'],
+                'artistName'       => (string) $show['author'],
+                'artworkUrl600'    => (string) $show['image'],
+                'trackCount'       => (int) $show['episodes'],
+                'primaryGenreName' => 'Religion & Spirituality',
+            );
+        }
+    }
+    $feeds = array_values($feeds);
+    return $pinned;
+}
+
+function podcastindex_results(array $feeds, array $pinned = array()): string
 {
     $hidden = array('stale' => 0, 'empty' => 0, 'duplicate' => 0);
     $live = array();
@@ -742,7 +787,7 @@ function podcastindex_results(array $feeds): string
             'primaryGenreName' => $categories ? (string) $categories[0] : null,
         );
     }
-    return json_encode(array('results' => $results, 'hidden' => $hidden, 'source' => 'podcastindex'));
+    return json_encode(array('results' => array_merge($pinned, $results), 'hidden' => $hidden, 'source' => 'podcastindex'));
 }
 
 // ---- routes ---------------------------------------------------------------
@@ -778,7 +823,9 @@ function handle_search(): void
                 $feeds[$url] = $feed;
             }
         }
-        send_body(podcastindex_results(array_slice(array_values($feeds), 0, $limit)),
+        $feeds  = array_slice(array_values($feeds), 0, $limit);
+        $pinned = combined_feeds_for($term, $feeds);
+        send_body(podcastindex_results($feeds, $pinned),
             'application/json; charset=utf-8', 'public, max-age=600');
     }
     $target = ITUNES_SEARCH . '?' . http_build_query(array(

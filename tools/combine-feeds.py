@@ -19,6 +19,7 @@ from pathlib import Path
 
 ATOM = "{http://www.w3.org/2005/Atom}"
 ITUNES = "http://www.itunes.com/dtds/podcast-1.0.dtd"
+SITE = "https://podcast.4thepeople.live"
 USER_AGENT = "4thepeople-podcasts/1.0 (+https://podcast.4thepeople.live)"
 
 
@@ -123,6 +124,22 @@ def main(config_path):
     output.write_text('<?xml version="1.0" encoding="utf-8"?>\n'
                       '<?xml-stylesheet type="text/xsl" href="/feeds/feed.xsl"?>\n' + body + "\n", encoding="utf-8")
     print(f"{len(seen)} episodes -> {output}")
+
+    # Search reads this index to list the combined show in place of its parts.
+    public = Path(config_path).parent.parent / "public"
+    index_path = public / "feeds" / "combined.json"
+    index = json.loads(index_path.read_text()) if index_path.exists() else {}
+    feed_url = SITE + "/" + output.relative_to(public).as_posix()
+    index[feed_url] = {
+        "title": config["title"],
+        "author": config["author"],
+        "image": config["image"],
+        "episodes": len(seen),
+        "terms": config.get("search_terms", [config["title"].lower()]),
+        "hosts": config.get("replaces_hosts", []),
+        "feeds": sorted(set(config["sources"]) | set(config.get("replaces", []))),
+    }
+    index_path.write_text(json.dumps(index, indent=2) + "\n")
 
 
 if __name__ == "__main__":
