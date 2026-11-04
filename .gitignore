@@ -10,3 +10,6 @@ public/data/*
 public/download/*.apk
 public/download/release.json
 public/deploy-key.php
+
+# Local test-server data: accounts, password hashes, keys. Never commit.
+data/
