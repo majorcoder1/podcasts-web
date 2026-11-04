@@ -680,6 +680,7 @@ function podcastindex_results(array $feeds): string
 {
     $hidden = array('stale' => 0, 'empty' => 0, 'duplicate' => 0);
     $live = array();
+    $stale = array();
     foreach ($feeds as $feed) {
         $url = (string) ($feed['url'] ?? '');
         if ($url === '') {
@@ -688,11 +689,21 @@ function podcastindex_results(array $feeds): string
         $newest = podcastindex_newest($feed);
         if (!empty($feed['dead']) || ($newest > 0 && $newest < time() - PODCASTINDEX_STALE_AFTER)) {
             $hidden['stale']++;
+            if (empty($feed['dead']) && (int) ($feed['episodeCount'] ?? 1) > 0) {
+                $stale[] = $feed;
+            }
         } elseif (isset($feed['episodeCount']) && (int) $feed['episodeCount'] === 0) {
             $hidden['empty']++;
         } else {
             $live[] = $feed;
         }
+    }
+
+    // Archive shows that finished long ago (Apostolic Classics, for one) would
+    // otherwise vanish, so a search with nothing live falls back to them.
+    if (!$live && $stale) {
+        $live = $stale;
+        $hidden['stale'] = 0;
     }
 
     // The original is the copy that posted most recently, then the longest.
