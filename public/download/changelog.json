@@ -22,9 +22,10 @@
       {
         "heading": "Apostolic Classics in one feed",
         "items": [
-          "Apostolic Classics was spread over five separate podcast feeds. Its episodes are now gathered into one show, newest first, with repeats removed: 351 sermons.",
+          "Apostolic Classics was spread over five separate podcast feeds. Its sermons are now gathered into one show, newest first: 342 sermons, with re-uploaded repeats, PDFs and videos left out.",
           "Subscribe by pasting https://podcast.4thepeople.live/feeds/apostolic-classics.xml into the app or the web player.",
-          "Nothing was copied. Every sermon still plays from the Apostolic Classics archive."
+          "Nothing was copied. Every sermon still plays from the Apostolic Classics archive.",
+          "Opening the feed address in a web browser now shows a readable list of sermons and how to subscribe, instead of raw feed code."
         ]
       }
     ]

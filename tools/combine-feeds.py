@@ -10,6 +10,7 @@ The JSON names the output file, the channel details and the source feeds.
 """
 import email.utils
 import json
+import re
 from datetime import datetime
 import sys
 import urllib.request
@@ -68,6 +69,7 @@ def episodes(root):
 def main(config_path):
     config = json.loads(Path(config_path).read_text())
     seen = {}
+    repeats = set()
     for source in config["sources"]:
         try:
             found = list(episodes(fetch(source)))
@@ -76,9 +78,15 @@ def main(config_path):
             continue
         added = 0
         for episode in found:
-            if episode["url"] not in seen:
-                seen[episode["url"]] = episode
-                added += 1
+            if episode["url"] in seen or not episode["type"].startswith("audio/"):
+                continue
+            # The archive re-uploaded many sermons; same title and length is a repeat.
+            key = (re.sub(r"[^a-z0-9]", "", episode["title"].lower().replace("- audio", ""))[:12], episode["duration"])
+            if episode["duration"] and key in repeats:
+                continue
+            repeats.add(key)
+            seen[episode["url"]] = episode
+            added += 1
         print(f"{added:4} new of {len(found):4} from {source}")
 
     ET.register_namespace("itunes", ITUNES)
@@ -110,7 +118,10 @@ def main(config_path):
     ET.indent(rss)
     output = Path(config_path).parent.parent / config["output"]
     output.parent.mkdir(parents=True, exist_ok=True)
-    ET.ElementTree(rss).write(output, encoding="utf-8", xml_declaration=True)
+    # The stylesheet turns the feed into a readable page when opened in a browser.
+    body = ET.tostring(rss, encoding="unicode")
+    output.write_text('<?xml version="1.0" encoding="utf-8"?>\n'
+                      '<?xml-stylesheet type="text/xsl" href="/feeds/feed.xsl"?>\n' + body + "\n", encoding="utf-8")
     print(f"{len(seen)} episodes -> {output}")
 
 

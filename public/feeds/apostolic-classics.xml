@@ -1,4 +1,5 @@
-<?xml version='1.0' encoding='utf-8'?>
+<?xml version="1.0" encoding="utf-8"?>
+<?xml-stylesheet type="text/xsl" href="/feeds/feed.xsl"?>
 <rss xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd" version="2.0">
   <channel>
     <title>Apostolic Classics (All Feeds)</title>
@@ -69,13 +70,6 @@
       <itunes:duration>4781</itunes:duration>
     </item>
     <item>
-      <title>Because of the Angels - PDF</title>
-      <guid isPermaLink="false">https://apostolicclassics.sermon.net/4433382/controller/link/action/podcast/type/pdf_becauseoftheangels/id/159449</guid>
-      <pubDate>Mon, 24 Nov 2008 01:00:00 +0000</pubDate>
-      <description>Bro. James Groce Preaches on "Because Of The Angels."  Not sure where this was preached.</description>
-      <enclosure url="https://apostolicclassics.sermon.net/4433382/controller/link/action/podcast/type/pdf_becauseoftheangels/id/159449" type="application/pdf" length="66425" />
-    </item>
-    <item>
       <title>The Exacting Labor Of The Gospel - Audio</title>
       <guid isPermaLink="false">https://apostolicclassics.sermon.net/21944536/controller/link/action/podcast/type/audio_theexactinglaborofthegospel/id/3784926.mp3</guid>
       <pubDate>Fri, 07 Jul 2006 02:41:00 +0000</pubDate>
@@ -134,14 +128,6 @@
       <pubDate>Tue, 04 Jul 2000 02:40:00 +0000</pubDate>
       <description>Rev. James Groce preaches "Small Things" at Life Tabernacle Baton Rouge Camp Meeting 2000</description>
       <enclosure url="https://apostolicclassics.sermon.net/21944537/controller/link/action/podcast/type/audio_smallthings/id/3784927.mp3" type="audio/mpeg" length="52546239" />
-      <itunes:duration>4378</itunes:duration>
-    </item>
-    <item>
-      <title>Small Things - Audio</title>
-      <guid isPermaLink="false">https://apostolicclassics.sermon.net/4433432/controller/link/action/podcast/type/audio_smallthings/id/1004417.mp3</guid>
-      <pubDate>Mon, 03 Jul 2000 01:00:00 +0000</pubDate>
-      <description>Bro. Groce preaches "Small Things" at Life Tabernacle Campmeeting 2000 in Baton Rouge LA (Pastor B.A. Spell) on Monday Morning July 3, 2000 </description>
-      <enclosure url="https://apostolicclassics.sermon.net/4433432/controller/link/action/podcast/type/audio_smallthings/id/1004417.mp3" type="audio/mpeg" length="35081302" />
       <itunes:duration>4378</itunes:duration>
     </item>
     <item>
@@ -370,14 +356,6 @@ Sermons from the Vault of Apostolic Classics.  You can see all our content in ou
     </item>
     <item>
       <title>I Am Not An Egyptian - Jeff Arnold - Audio</title>
-      <guid isPermaLink="false">https://apostolicclassics.sermon.net/21940421/controller/link/action/podcast/type/audio_iamnotanegyptianeffarnold/id/3780999.mp3</guid>
-      <pubDate>Sat, 20 Nov 1999 03:41:00 +0000</pubDate>
-      <description>Sermon by Rev. Jeff Arnold "I am not an Egyptian"</description>
-      <enclosure url="https://apostolicclassics.sermon.net/21940421/controller/link/action/podcast/type/audio_iamnotanegyptianeffarnold/id/3780999.mp3" type="audio/mpeg" length="57434114" />
-      <itunes:duration>4786</itunes:duration>
-    </item>
-    <item>
-      <title>I Am Not An Egyptian - Jeff Arnold - Audio</title>
       <guid isPermaLink="false">https://apostolicclassics.sermon.net/20541747/controller/link/action/podcast/type/audio_iamnotanegyptianeffarnold/id/2485850.mp3</guid>
       <pubDate>Sat, 20 Nov 1999 02:31:46 +0000</pubDate>
       <description>Bro. Jeff Arnold preaches on "I Am Not An Egyptian"  Unsure when or where this was preached.</description>
@@ -425,14 +403,6 @@ Sermons from the Vault of Apostolic Classics.  You can see all our content in ou
       <itunes:duration>3866</itunes:duration>
     </item>
     <item>
-      <title>Blessed Moments with Murrell Ewing - Audio</title>
-      <guid isPermaLink="false">https://apostolicclassics.sermon.net/21940689/controller/link/action/podcast/type/audio_blessedmomentswithmurrellewing/id/3781241.mp3</guid>
-      <pubDate>Wed, 06 Oct 1999 01:04:00 +0000</pubDate>
-      <description>Blessed Moments- Rev. Murrell Ewing</description>
-      <enclosure url="https://apostolicclassics.sermon.net/21940689/controller/link/action/podcast/type/audio_blessedmomentswithmurrellewing/id/3781241.mp3" type="audio/mpeg" length="20392480" />
-      <itunes:duration>1699</itunes:duration>
-    </item>
-    <item>
       <title>Is the UPCI a Cult? Bernard Debates Morey - Audio</title>
       <guid isPermaLink="false">https://apostolicclassics.sermon.net/22181132/controller/link/action/podcast/type/audio_istheupciacultbernarddebatesmo/id/4015508.mp3</guid>
       <pubDate>Wed, 06 Oct 1999 00:58:00 +0000</pubDate>
@@ -455,14 +425,6 @@ Sermons from the Vault of Apostolic Classics.  You can see all our content in ou
       <description>David K. Bernard, J. L. Hall, Robert Morey, &amp; Edgar Havaich Discuss Oneness Pentecostal Theology</description>
       <enclosure url="https://apostolicclassics.sermon.net/22181122/controller/link/action/podcast/type/audio_onenesspentecostaltheology/id/4015499.mp3" type="audio/mpeg" length="73658710" />
       <itunes:duration>6101</itunes:duration>
-    </item>
-    <item>
-      <title>Blessed Moments with Murrell Ewing - Video</title>
-      <guid isPermaLink="false">https://apostolicclassics.sermon.net/21947258/controller/link/action/podcast/type/video_blessedmomentswithmurrellewing/id/1184629.mp4</guid>
-      <pubDate>Tue, 05 Oct 1999 16:38:00 +0000</pubDate>
-      <description>Blessed Moments with Rev. Murrell Ewing</description>
-      <enclosure url="https://apostolicclassics.sermon.net/21947258/controller/link/action/podcast/type/video_blessedmomentswithmurrellewing/id/1184629.mp4" type="video/mp4" length="194339806" />
-      <itunes:duration>1699</itunes:duration>
     </item>
     <item>
       <title>Blessed Moments with Murrell Ewing - Audio</title>
@@ -840,14 +802,6 @@ Sermons from the Vault of Apostolic Classics.  You can see all our content in ou
       <itunes:duration>3788</itunes:duration>
     </item>
     <item>
-      <title>Declare His Generation or Lose It - James Kilgore - Audio</title>
-      <guid isPermaLink="false">https://apostolicclassics.sermon.net/21940443/controller/link/action/podcast/type/audio_declarehisgenerationorloseitam/id/3781015.mp3</guid>
-      <pubDate>Sat, 19 Jun 1999 02:42:00 +0000</pubDate>
-      <description>Declare his generation or lose it- Rev. james Kilgore</description>
-      <enclosure url="https://apostolicclassics.sermon.net/21940443/controller/link/action/podcast/type/audio_declarehisgenerationorloseitam/id/3781015.mp3" type="audio/mpeg" length="52453414" />
-      <itunes:duration>4371</itunes:duration>
-    </item>
-    <item>
       <title>"Declare His Generation or Lose It" James Kilgore - Audio</title>
       <guid isPermaLink="false">https://apostolicclassics.sermon.net/20422426/controller/link/action/podcast/type/audio_declarehisgenerationorloseitam/id/2374763.mp3</guid>
       <pubDate>Fri, 18 Jun 1999 18:21:16 +0000</pubDate>
@@ -941,14 +895,6 @@ Sermons from the Vault of Apostolic Classics.  You can see all our content in ou
       <pubDate>Tue, 06 Apr 1999 18:28:00 +0000</pubDate>
       <description>Bro. Rex Johnson preaches 1999 BOTT on "Praise Break"</description>
       <enclosure url="https://apostolicclassics.sermon.net/20464825/controller/link/action/podcast/type/audio_praisebreakrexohnson/id/2413532.mp3" type="audio/mpeg" length="27471056" />
-    </item>
-    <item>
-      <title>"Consistency Thou Art A Jewel" Charles Duplissey - Audio</title>
-      <guid isPermaLink="false">https://apostolicclassics.sermon.net/21940449/controller/link/action/podcast/type/audio_consistencythouartaewelcharles/id/3781018.mp3</guid>
-      <pubDate>Sat, 20 Mar 1999 03:42:00 +0000</pubDate>
-      <description>Consistency thou art a Jewel- Rev. Charles Duplissey</description>
-      <enclosure url="https://apostolicclassics.sermon.net/21940449/controller/link/action/podcast/type/audio_consistencythouartaewelcharles/id/3781018.mp3" type="audio/mpeg" length="30867547" />
-      <itunes:duration>2572</itunes:duration>
     </item>
     <item>
       <title>"Consistency Thou Art A Jewel" Charles Duplissey - Audio</title>
@@ -1768,13 +1714,6 @@ Pastor Jonathon Alvear</description>
       <itunes:duration>5249</itunes:duration>
     </item>
     <item>
-      <title>Christ Our Example - Christ In The Tabernacle Lesson 5 - PDF</title>
-      <guid isPermaLink="false">https://apostolicclassics.sermon.net/22539178/controller/link/action/podcast/type/pdf_christourexamplechristinthetab/id/461354</guid>
-      <pubDate>Fri, 05 Jan 1990 20:14:00 +0000</pubDate>
-      <description>Christ Our Example - Christ In The Tabernacle Lesson 5 - Rev. Edmond Dyess</description>
-      <enclosure url="https://apostolicclassics.sermon.net/22539178/controller/link/action/podcast/type/pdf_christourexamplechristinthetab/id/461354" type="application/pdf" length="824446" />
-    </item>
-    <item>
       <title>Christ The Final Authority - Christ In The Tabernacle Lesson 4 - Audio</title>
       <guid isPermaLink="false">https://apostolicclassics.sermon.net/22533180/controller/link/action/podcast/type/audio_christthefinalauthoritychristi/id/4353323.mp3</guid>
       <pubDate>Fri, 05 Jan 1990 02:44:00 +0000</pubDate>
@@ -1805,13 +1744,6 @@ Pastor Jonathon Alvear</description>
       <description>Rev. Edmond L. Dyess teaches on Christ in the Tabernacle Part 1 "Prophet, Priest, and King"</description>
       <enclosure url="https://apostolicclassics.sermon.net/22522031/controller/link/action/podcast/type/audio_prophetpriestandkingchristinth/id/4342439.mp3" type="audio/mpeg" length="125446218" />
       <itunes:duration>5043</itunes:duration>
-    </item>
-    <item>
-      <title>Prophet Priest and King - Christ In The Tabernacle Part 1 - PDF</title>
-      <guid isPermaLink="false">https://apostolicclassics.sermon.net/22522031/controller/link/action/podcast/type/pdf_prophetpriestandkingchristinth/id/461355</guid>
-      <pubDate>Tue, 02 Jan 1990 01:34:00 +0000</pubDate>
-      <description>Rev. Edmond L. Dyess teaches on Christ in the Tabernacle Part 1 "Prophet, Priest, and King"</description>
-      <enclosure url="https://apostolicclassics.sermon.net/22522031/controller/link/action/podcast/type/pdf_prophetpriestandkingchristinth/id/461355" type="application/pdf" length="824446" />
     </item>
     <item>
       <title>Two Spiritual Elements Needed To Win A Battle - Audio</title>
